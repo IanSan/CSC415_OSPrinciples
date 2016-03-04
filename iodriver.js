@@ -6,12 +6,18 @@ var io = {
         ioreq.done = true;
     },
     read: function(ioreq) {
-        //get fp for given filename
-        ioreq.data = fs.getFileData(ioreq.fp);
+        for (var i = 0; i < ioreq.size; i++) {
+            ioreq.data[i] = fs.getFileData(ioreq.fp);
+            ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+        }
         ioreq.done = true;
-    }, 
+    },
     write: function(ioreq) {
-
+        for (var i = 0; i < ioreq.size; i++) {
+            fs.setFileData(ioreq.fp, ioreq.data[i]);
+            ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+        }
+        ioreq.done = true;
     }
 };
 
@@ -30,6 +36,6 @@ function iodriver(ioreq) {
             break;
         case "close":
             setTimeout(io.close(ioreq), 10);
-            break; 
+            break;
     }
 }
