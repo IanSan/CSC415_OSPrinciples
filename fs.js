@@ -10,7 +10,7 @@ var fs = {
     */
     getFilePointer: function(filename) {
         if(filename in fs.data) {
-            return FilePointer(filename);
+            return new FilePointer(filename);
         } else {
             //ERROR file not found
             return undefined;
