@@ -26,10 +26,10 @@ function ioreturn(ioreq) {
     //update variable assignment
     switch(argv[0]) {
         case "open":
-            ioreq.pcb.currVarlist.setVar(argv[3], ioreq.fp);
+            ioreq.pcb.currVarlist.setValue(argv[3], ioreq.fp);
             break;
         case "read":
-            ioreq.pcb.currVarlist.setVar(argv[3], ioreq.data);
+            ioreq.pcb.currVarlist.setValue(argv[3], ioreq.data);
             break;
         case "write":
             break;
@@ -62,10 +62,10 @@ function exec(pcb) {
         case "close":
             break;
         case "set":
-            pcb.currVarlist.setVar(argv[1], argv[2]);
+            pcb.currVarlist.setValue(argv[1], argv[2]);
             break;
         case "add":
-            pcb.currVarlist.setVar(argv[1], pcb.currVarlist.getVar[argv[2]] + pcb.currVarlist.getVar[argv[3]]);
+            pcb.currVarlist.setValue(argv[1], pcb.currVarlist.getValue[argv[2]] + pcb.currVarlist.getValue[argv[3]]);
             break;
         default:
             //ERROR

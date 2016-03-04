@@ -3,26 +3,26 @@
 function varlist(parentVarlist) {
     this.parent = parentVarlist;
 }
-varlist.prototype.setVar = function(identifier, value, scope) {
+varlist.prototype.setValue = function(identifier, value, scope) {
     if(scope === undefined) {
         scope = this;
     }
     if(identifier in scope) {
         return scope[identifier] = value;
     } else if(scope.parent !== undefined) { //not in scope, check parent
-        return this.setVar(identifier, value, scope.parent);
+        return this.setValue(identifier, value, scope.parent);
     } else {    //set new variable in current scope
         return this[identifier] = value;
     }
 };
-varlist.prototype.getVar = function(identifier, scope) {
+varlist.prototype.getValue = function(identifier, scope) {
     if(scope === undefined) {
         scope = this;
     }
     if(identifier in scope) {
         return scope[identifier];
     } else if(scope.parent !== undefined) { //not in scope, check parent
-        return this.getVar(identifier, scope.parent);
+        return this.getValue(identifier, scope.parent);
     } else {
         return undefined;
     }
