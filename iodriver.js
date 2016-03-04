@@ -7,6 +7,7 @@ var io = {
         io.ready = true;
     },
     read: function(ioreq) {
+        ioreq.data = new Array();
         for (var i = 0; i < ioreq.size; i++) {
             ioreq.data[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
