@@ -23,6 +23,9 @@ var fs = {
     */
     getFileData: function(filepointer) {
         return fs.data[filepointer.filename][filepointer.index];
-    }
+    },
+    setFileData: function(filepointer) {
+        return fs.data[filepointer.filename][filepointer.index];
+    },
 
 };
