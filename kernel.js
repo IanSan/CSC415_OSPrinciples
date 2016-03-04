@@ -5,10 +5,12 @@ var pq = new Queue();
 var fq = new Queue();
 
 //create new process
+var programCounter = 0;
 function load(program) {
-    pq.push_back(new PCB(program, "start", 0, undefined));
-    console.log("loaded process");
+    pq.push_back(new PCB(program, "start", programCounter, undefined));
+    console.log("start process"+ programCounter);
     console.log(pq.tail.object.program);
+    programCounter++;
 };
 
 //I/O request object
@@ -38,9 +40,7 @@ function ioreturn(ioreq) {
         default:
             console.log("IO Return Error");
     }
-    //increment pc and set ready
-    ioreq.pcb.pc = ioreq.pcb.pc + 1;
-    ioreq.pcb.state = "ready";
+    ioreq.pcb.state = "ready";   
 }
 
 
@@ -53,28 +53,40 @@ function ioreturn(ioreq) {
 * add
 */
 function exec(pcb) {
+    console.log("process change state "+pcb.state+" to running for exec");
+    var pcb.state = "running";
     var argv = pcb.program[pcb.pc];
     var cmd = argv[0];
     switch(cmd) {
         case "open":
             fq.push_back(new IORequest(cmd, pcb, undefined, argv[1]));
+            console.log("process change state running to waiting for " + cmd);
             pcb.state = "waiting";
             break;
         case "read":
             fq.push_back(new IORequest(cmd, pcb, argv[1], undefined));
+            console.log("process change state running to waiting for " + cmd);
             pcb.state = "waiting";
             break;
         case "write":
+
+            console.log("process change state running to waiting for " + cmd);
             pcb.state = "waiting";
             break;
         case "close":
+
+            console.log("process change state running to waiting for " + cmd);
             pcb.state = "waiting";
             break;
         case "set":
             pcb.currVarlist.setValue(argv[1], argv[2]);
+            console.log("process change state running to ready for " + cmd);
+            pcb.state = "ready";
             break;
         case "add":
             pcb.currVarlist.setValue(argv[1], pcb.currVarlist.getValue[argv[2]] + pcb.currVarlist.getValue[argv[3]]);
+            console.log("process change state running to ready for " + cmd);
+            pcb.state = "ready";
             break;
         case "do":
             break;
@@ -83,6 +95,13 @@ function exec(pcb) {
         default:
             console.log("exec error: cannot find cmd :" + cmd);//ERROR
             break;
+    }
+    //increment pc
+    pcb.pc = pcb.pc + 1; 
+    //end of process file then will delete
+    if (pcb.length-1 < pcb.pc ) {
+        console.log("process change state running to stop");
+        pcb.state = "stop";
     }
 };
 
@@ -94,11 +113,12 @@ function kernel() {
     //execute instructions of ready processes
     while(true) {
         //run next ready proc in queue
-        while(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
+        if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
             exec(pq.front());
         }
         //move process to end of queue
         if(!pq.isEmpty() && pq.front().state === "stop") {
+            console.log("finished "+ pq.front().pid );
             pq.pop_front();
         } else {
             pq.push_back(pq.pop_front());
@@ -106,6 +126,7 @@ function kernel() {
         
         //unload finished processes
         while(!pq.isEmpty() && pq.front().state === "stop") {
+            console.log("finished "+ pq.front().pid );
             pq.pop_front();
         }
         
