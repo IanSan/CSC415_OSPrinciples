@@ -4,14 +4,20 @@ var io = {
         //get fp for given filename
         ioreq.fp = fs.getFilePointer(ioreq.data);
         ioreq.done = true;
+        io.ready = true;
     },
     read: function(ioreq) {
         //get fp for given filename
         ioreq.data = fs.getFileData(ioreq.fp);
         ioreq.done = true;
+        io.ready = true;
+
     }, 
     write: function(ioreq) {
-
+        //do the write thing
+        
+        ioreq.done = true;
+        io.ready = true;
     }
 };
 

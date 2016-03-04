@@ -6,7 +6,7 @@ var fq = new Queue();
 
 //create new process
 function load(program) {
-    pq.push_back(new PCB(program, "ready", 0, undefined));
+    pq.push_back(new PCB(program, "start", 0, undefined));
     console.log("loaded process");
     console.log(pq.tail.object.program);
 };
@@ -45,6 +45,13 @@ function ioreturn(ioreq) {
 
 
 //execute process instruction
+/** structure of process code should be the following: 
+* open-theCMD, desiredFile, fileFlag, addressOfLocation
+* read-theCMD, addressofLocation, null, desiredDestination
+* write 
+* close 
+* add
+*/
 function exec(pcb) {
     var argv = pcb.program[pcb.pc];
     var cmd = argv[0];
@@ -58,8 +65,10 @@ function exec(pcb) {
             pcb.state = "waiting";
             break;
         case "write":
+            pcb.state = "waiting";
             break;
         case "close":
+            pcb.state = "waiting";
             break;
         case "set":
             pcb.currVarlist.setValue(argv[1], argv[2]);
@@ -67,8 +76,12 @@ function exec(pcb) {
         case "add":
             pcb.currVarlist.setValue(argv[1], pcb.currVarlist.getValue[argv[2]] + pcb.currVarlist.getValue[argv[3]]);
             break;
+        case "do":
+            break;
+        case "while":
+            break;
         default:
-            //ERROR
+            console.log("exec error: cannot find cmd :" + cmd);//ERROR
             break;
     }
 };
@@ -78,22 +91,21 @@ function kernel() {
     console.log("kernel started");
     //load everything
     load(p1);
-    
     //execute instructions of ready processes
     while(true) {
         //run next ready proc in queue
-        while(!pq.isEmpty() && pq.front().state === "ready") {
+        while(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
             exec(pq.front());
         }
         //move process to end of queue
-        if(!pq.isEmpty() && pq.front().state === "terminated") {
+        if(!pq.isEmpty() && pq.front().state === "stop") {
             pq.pop_front();
         } else {
             pq.push_back(pq.pop_front());
         }
         
         //unload finished processes
-        while(!pq.isEmpty() && pq.front().state === "terminated") {
+        while(!pq.isEmpty() && pq.front().state === "stop") {
             pq.pop_front();
         }
         
@@ -101,10 +113,10 @@ function kernel() {
         while(io.ready && !fq.isEmpty() && !fq.front().done) {
             iodriver(fq.front());
         }
+
         //return finished io requests
         while(!fq.isEmpty() && fq.front().done) {
-            //return data to requesting process
-            //remove io request
+            //return data to requesting process & remove io request
             ioreturn(fq.pop_front());
         }
     }
