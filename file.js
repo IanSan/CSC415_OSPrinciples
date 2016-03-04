@@ -1,7 +1,8 @@
 //FileStruct object
-function FileStruct(filename, flags) {
-    this.filename = filename;   //string filename
-    this.flags = flags;
+function FileStruct(filepointer, flags) {
+    this.filepointer = filepointer;   //
+    this.flags = flags;				  //permission type: read, write, readwrite
+
 }
 
 

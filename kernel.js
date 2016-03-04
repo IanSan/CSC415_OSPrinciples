@@ -54,7 +54,7 @@ function exec(pcb) {
             pcb.state = "waiting";
             break;
         case "read":
-            fq.push_back(new IORequest(cmd, pcb, argv[1]));
+            fq.push_back(new IORequest(cmd, pcb, argv[1], undefined));
             pcb.state = "waiting";
             break;
         case "write":

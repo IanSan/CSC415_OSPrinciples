@@ -41,4 +41,5 @@ function PCB(program, state, pid, parent) {
     this.varlist = new varlist(
             this.parent === undefined ? undefined : this.parent.currVarlist);
     this.currVarlist = this.varlist;    //ref to current scope
+    this.fileList = new Array();
 }

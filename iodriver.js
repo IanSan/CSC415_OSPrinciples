@@ -9,9 +9,13 @@ var io = {
         //get fp for given filename
         ioreq.data = fs.getFileData(ioreq.fp);
         ioreq.done = true;
+    }, 
+    write: function(ioreq) {
+
     }
 };
 
+//setTimeout(function, time-ms) after the time in millisec pass the function will trigger
 function iodriver(ioreq) {
     io.ready = false;
     switch(ioreq.task) {
@@ -21,5 +25,11 @@ function iodriver(ioreq) {
         case "read":
             setTimeout(io.read(ioreq), 10);
             break;
+        case "write":
+            setTimeout(io.write(ioreq), 10);
+            break;
+        case "close":
+            setTimeout(io.close(ioreq), 10);
+            break; 
     }
 }
