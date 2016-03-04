@@ -10,7 +10,7 @@ var fs = {
     */
     getFilePointer: function(filename) {
         if(filename in fs.data) {
-            return FilePointer(filename);
+            return new FilePointer(filename);
         } else {
             //ERROR file not found
             return undefined;
@@ -23,6 +23,9 @@ var fs = {
     */
     getFileData: function(filepointer) {
         return fs.data[filepointer.filename][filepointer.index];
-    }
+    },
+    setFileData: function(filepointer) {
+        return fs.data[filepointer.filename][filepointer.index];
+    },
 
 };

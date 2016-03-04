@@ -14,11 +14,12 @@ function load(program) {
 };
 
 //I/O request object
-function IORequest(task, pcb, fp, data) {
+function IORequest(task, pcb, fp, data, size) {
     this.task = task;
     this.pcb = pcb;     //ref of requesting process
     this.fp = fp;       //file pointer
     this.data = data;
+    this.size = size;   //number of chars to read/write
     this.done = false;  //boolean has this request been responded to?
 };
 
@@ -64,6 +65,7 @@ function exec(pcb) {
             pcb.state = "waiting";
             break;
         case "read":
+<<<<<<< HEAD
             fq.push_back(new IORequest(cmd, pcb, argv[1], undefined));
             console.log("process change state running to waiting for " + cmd);
             pcb.state = "waiting";
@@ -71,6 +73,19 @@ function exec(pcb) {
         case "write":
 
             console.log("process change state running to waiting for " + cmd);
+=======
+            fq.push_back(new IORequest(cmd, pcb,
+                    pcb.currVarlist.getValue(argv[1]),  //fp
+                    undefined,  //data
+                    argv[2]));  //size
+            pcb.state = "waiting";
+            break;
+        case "write":
+            fq.push_back(new IORequest(cmd, pcb,
+                    pcb.currVarlist.getValue(argv[1]),  //fp
+                    argv[2],    //data
+                    argv[2].length));   //size
+>>>>>>> origin/kernel
             pcb.state = "waiting";
             break;
         case "close":
