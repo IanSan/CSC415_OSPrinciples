@@ -32,7 +32,7 @@ varlist.prototype.getVar = function(identifier, scope) {
 //process control block object
 function PCB(program, state, pid, parent) {
     this.program = program; //program code
-    this.sState = state;    //string process state
+    this.state = state;    //string process state
     this.pc = 0;            //integer program counter
     this.pid = pid;         //integer process id
     this.mode = 0;          //user/kernel mode
