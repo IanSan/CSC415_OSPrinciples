@@ -2,14 +2,12 @@ var io = {
     ready: true,
     open: function(ioreq) {
         //get fp for given filename
-        //TODO
-        ioreq.fp = 1;
+        ioreq.fp = fs.getFilePointer(ioreq.data);
         ioreq.done = true;
     },
     read: function(ioreq) {
         //get fp for given filename
-        //TODO
-        ioreq.data = data;
+        ioreq.data = fs.getFileData(ioreq.fp);
         ioreq.done = true;
     }
 };
