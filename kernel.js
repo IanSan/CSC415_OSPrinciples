@@ -65,27 +65,19 @@ function exec(pcb) {
             pcb.state = "waiting";
             break;
         case "read":
-<<<<<<< HEAD
-            fq.push_back(new IORequest(cmd, pcb, argv[1], undefined));
             console.log("process change state running to waiting for " + cmd);
-            pcb.state = "waiting";
-            break;
-        case "write":
-
-            console.log("process change state running to waiting for " + cmd);
-=======
             fq.push_back(new IORequest(cmd, pcb,
-                    pcb.currVarlist.getValue(argv[1]),  //fp
-                    undefined,  //data
-                    argv[2]));  //size
+            pcb.currVarlist.getValue(argv[1]),  //fp
+                                    undefined,  //data
+                                    argv[2]));  //size
             pcb.state = "waiting";
             break;
         case "write":
+            console.log("process change state running to waiting for " + cmd);
             fq.push_back(new IORequest(cmd, pcb,
                     pcb.currVarlist.getValue(argv[1]),  //fp
                     argv[2],    //data
                     argv[2].length));   //size
->>>>>>> origin/kernel
             pcb.state = "waiting";
             break;
         case "close":
