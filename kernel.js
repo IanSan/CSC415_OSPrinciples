@@ -56,53 +56,11 @@ function ioreturn(ioreq) {
 function exec(pcb) {
     console.log("process change state "+pcb.state+" to running for exec");
     pcb.state = "running";
-    var argv = pcb.program[pcb.pc];
-    var cmd = argv[0];
-    switch(cmd) {
-        case "open":
-            fq.push_back(new IORequest(cmd, pcb, undefined, argv[1]));
-            console.log("process change state running to waiting for " + cmd);
-            pcb.state = "waiting";
-            break;
-        case "read":
-            console.log("process change state running to waiting for " + cmd);
-            fq.push_back(new IORequest(cmd, pcb,
-            pcb.currVarlist.getValue(argv[1]),  //fp
-                                    undefined,  //data
-                                    argv[2]));  //size
-            pcb.state = "waiting";
-            break;
-        case "write":
-            console.log("process change state running to waiting for " + cmd);
-            fq.push_back(new IORequest(cmd, pcb,
-                    pcb.currVarlist.getValue(argv[1]),  //fp
-                    argv[2],    //data
-                    argv[2].length));   //size
-            pcb.state = "waiting";
-            break;
-        case "close":
-
-            console.log("process change state running to waiting for " + cmd);
-            pcb.state = "waiting";
-            break;
-        case "set":
-            pcb.currVarlist.setValue(argv[1], argv[2]);
-            console.log("process change state running to ready for " + cmd);
-            pcb.state = "ready";
-            break;
-        case "add":
-            pcb.currVarlist.setValue(argv[1], pcb.currVarlist.getValue[argv[2]] + pcb.currVarlist.getValue[argv[3]]);
-            console.log("process change state running to ready for " + cmd);
-            pcb.state = "ready";
-            break;
-        case "do":
-            break;
-        case "while":
-            break;
-        default:
-            console.log("exec error: cannot find cmd :" + cmd);//ERROR
-            break;
-    }
+    var line = pcb.program[pcb.pc];
+    //line[0] must be a function object
+    //line[1] is the array of arguments for function
+    line[0](line[1]);
+    
     //increment pc
     pcb.pc = pcb.pc + 1; 
     //end of process file then will delete
