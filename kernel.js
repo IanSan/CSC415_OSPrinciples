@@ -55,7 +55,7 @@ function ioreturn(ioreq) {
 */
 function exec(pcb) {
     console.log("process change state "+pcb.state+" to running for exec");
-    var pcb.state = "running";
+    pcb.state = "running";
     var argv = pcb.program[pcb.pc];
     var cmd = argv[0];
     switch(cmd) {

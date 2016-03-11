@@ -1,6 +1,6 @@
 var p1 =
 [
-    ["open", "stdIn", "r", "fp"],
+    ["open", "stdin", "r", "fp"],
     ["set", "data", ""],
     ["do"],
             ["read", "fp", -1, "buffer"],
@@ -11,7 +11,7 @@ var p1 =
     
     ["close", "fp" ],
     // Process Data
-    ["create", "stdOut", "wo+", "fp2"],
+    ["open", "stdout", "wo+", "fp2"],
     ["write", "fp2", "data"],
     ["close", "fp2"]    
 ];
