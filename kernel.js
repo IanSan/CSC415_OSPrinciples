@@ -43,7 +43,49 @@ function ioreturn(ioreq) {
     }
     ioreq.pcb.state = "ready";   
 }
+//====EXEC COMMANDS============================================
+function open(pcb, argv){
+    fq.push_back( new IORequest("open", pcb, undefined, argv[0]) );
+    console.log("process change state running to waiting for open");
+    pcb.state = "waiting";
+}
 
+function close(pcb, argv){
+
+}
+
+function read(pcb, argv){
+            console.log("process change state running to waiting for read");
+            fq.push_back(new IORequest("read", pcb,
+            pcb.currVarlist.getValue(argv[0]),  //fp
+                                    undefined,  //data
+                                    argv[1]));  //size
+            pcb.state = "waiting";
+}
+
+function write(pcb, argv){
+    console.log("process change state running to waiting for write");
+    fq.push_back(new IORequest("write", pcb,
+                pcb.currVarlist.getValue(argv[0]),  //fp
+                argv[1],    //data
+                argv[1].length));   //size
+    pcb.state = "waiting";
+}
+
+ function set(pcb, argv){
+    pcb.currVarlist.setValue(argv[0], argv[1]);
+    console.log("process change state running to ready for set");
+    pcb.state = "ready";
+}
+function add(pcb, argv){
+    pcb.currVarlist.setValue(argv[0], pcb.currVarlist.getValue[argv[2]] + pcb.currVarlist.getValue[argv[3]]);
+    console.log("process change state running to ready for add");
+    pcb.state = "ready";
+}
+
+
+
+//=============================================================
 
 //execute process instruction
 /** structure of process code should be the following: 
@@ -57,10 +99,8 @@ function exec(pcb) {
     console.log("process change state "+pcb.state+" to running for exec");
     pcb.state = "running";
     var line = pcb.program[pcb.pc];
-    //line[0] must be a function object
-    //line[1] is the array of arguments for function
-    line[0](line[1]);
-    
+    //line[0] must be a function object && line[1] is the array of arguments for function
+    line[0](pcb, line[1]);
     //increment pc
     pcb.pc = pcb.pc + 1; 
     //end of process file then will delete
