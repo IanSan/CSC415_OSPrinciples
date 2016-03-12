@@ -1,5 +1,8 @@
 var fs = {
     data: {
+        "stdin": "this is from stdin",
+        "stdout": "",
+        "stderr": "",
         "file1.csv": "abcdef",
         "file2.csv": "ghijkl"
     },
