@@ -31,16 +31,16 @@ function iodriver(ioreq) {
     io.ready = false;
     switch(ioreq.task) {
         case "open":
-            setTimeout(io.open(ioreq), 10);
+            setTimeout(function(){io.open(ioreq);}, Math.random()*1000);
             break;
         case "read":
-            setTimeout(io.read(ioreq), 10);
+            setTimeout(function(){io.read(ioreq);}, Math.random()*1000);
             break;
         case "write":
-            setTimeout(io.write(ioreq), 10);
+            setTimeout(function(){io.write(ioreq);}, Math.random()*1000);
             break;
         case "close":
-            setTimeout(io.close(ioreq), 10);
+            setTimeout(function(){io.close(ioreq);}, Math.random()*1000);
             break;
     }
 }

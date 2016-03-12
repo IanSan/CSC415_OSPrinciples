@@ -132,9 +132,8 @@ function exec(pcb) {
 
 
 function kernel() {
-    console.log("kernel started");
     //main kernel loop
-    while(!pq.isEmpty()) {
+    //while(!pq.isEmpty()) {
         //execute instructions of ready process
         if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
             exec(pq.front());
@@ -164,6 +163,14 @@ function kernel() {
             //return data to requesting process & remove io request
             ioreturn(fq.pop_front());
         }
-    }
-    console.log("all processes stopped, kernel stopped");
+        
+        //because javascript is single-threaded
+        //stop this line of execution and then restart it
+        //calling kernel() emulates while(!pq.isEmpty()) {...}
+        if(pq.isEmpty()) {
+            console.log("all processes stopped, kernel stopped");
+        } else {
+            setTimeout(function(){kernel();}, 0);
+        }
+    //}
 };
