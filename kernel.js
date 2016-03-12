@@ -126,7 +126,7 @@ function exec(pcb) {
     //increment pc
     pcb.pc = pcb.pc + 1; 
     //end of process file then will delete
-    if (pcb.length-1 < pcb.pc ) {
+    if(pcb.program.length-1 < pcb.pc) {
         console.log("process change state running to stop");
         pcb.state = "stop";
     }
@@ -136,7 +136,7 @@ function exec(pcb) {
 function kernel() {
     console.log("kernel started");
     //execute instructions of ready processes
-    while(true) {
+    while(!pq.isEmpty()) {
         //run next ready proc in queue
         if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
             exec(pq.front());
@@ -166,4 +166,5 @@ function kernel() {
             ioreturn(fq.pop_front());
         }
     }
+    console.log("all processes stopped, kernel stopped");
 };
