@@ -136,7 +136,7 @@ function exec(pcb) {
 function kernel() {
     console.log("kernel started");
     //execute instructions of ready processes
-    while(true) {
+    while(!pq.isEmpty()) {
         //run next ready proc in queue
         if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
             exec(pq.front());
@@ -166,4 +166,5 @@ function kernel() {
             ioreturn(fq.pop_front());
         }
     }
+    console.log("all processes stopped, kernel stopped");
 };
