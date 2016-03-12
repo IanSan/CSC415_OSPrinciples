@@ -87,8 +87,8 @@ function write(pcb, argv){
     fq.push_back(new IORequest("write", pcb,
             undefined,  //no variable to set
             pcb.currVarlist.getValue(argv[0]),  //fp
-            argv[1],    //data
-            argv[1].length));   //size
+            pcb.currVarlist.getValue(argv[1]),  //data
+            pcb.currVarlist.getValue(argv[1]).length)); //size
     pcb.state = "waiting";
 }
 
