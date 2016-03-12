@@ -43,7 +43,13 @@ function ioreturn(ioreq) {
     }
     ioreq.pcb.state = "ready";   
 }
+
 //====EXEC COMMANDS============================================
+// some definitions for our own sanity
+// _var : a string in user programs, but interpreted as a variable identifier
+
+//  [open, [string filename, string flags, _var filepointer]]
+// Opens a file called filename with given permission flags and sets filepointer
 function open(pcb, argv){
     fq.push_back(new IORequest("open", pcb,
             argv[2],    //var identifier to be set with fp
@@ -53,10 +59,15 @@ function open(pcb, argv){
     pcb.state = "waiting";
 }
 
+//  [close, [_var filepointer]]
+// Closes file corresponding to filepointer
 function close(pcb, argv){
 
 }
 
+//  [read, [_var filepointer, int size, _var stringBuffer]]
+// Sets buffer with size number of characters starting at where filepointer is
+// at. Increments filepointer to one past the last read character.
 function read(pcb, argv){
     console.log("process change state running to waiting for read");
     fq.push_back(new IORequest("read", pcb,
@@ -67,6 +78,10 @@ function read(pcb, argv){
     pcb.state = "waiting";
 }
 
+//  [write, [_var filepointer, _var stringBuffer]]
+// Writes buffer to where filepointer is at. If fp is not at the end of the file,
+// this will replace any existing data at that position. Increments filepointer
+// to one past the last written character.
 function write(pcb, argv){
     console.log("process change state running to waiting for write");
     fq.push_back(new IORequest("write", pcb,
