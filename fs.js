@@ -1,5 +1,8 @@
 var fs = {
     data: {
+        "stdin": "this is from stdin",
+        "stdout": "",
+        "stderr": "",
         "file1.csv": "abcdef",
         "file2.csv": "ghijkl"
     },
@@ -24,8 +27,11 @@ var fs = {
     getFileData: function(filepointer) {
         return fs.data[filepointer.filename][filepointer.index];
     },
-    setFileData: function(filepointer) {
-        return fs.data[filepointer.filename][filepointer.index];
+    setFileData: function(filepointer, char) {
+        fs.data[filepointer.filename] =
+                fs.data[filepointer.filename].substr(0,filepointer.index) +
+                char +
+                fs.data[filepointer.filename].substr(filepointer.index+1);
     },
 
 };

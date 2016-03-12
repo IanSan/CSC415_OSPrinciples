@@ -12,6 +12,7 @@ var io = {
             ioreq.data[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
         }
+        ioreq.data = ioreq.data.join("");
         ioreq.done = true;
         io.ready = true;
     }, 
