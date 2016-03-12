@@ -94,15 +94,11 @@ function write(pcb, argv){
 
  function set(pcb, argv){
     pcb.currVarlist.setValue(argv[0], argv[1]);
-    console.log("process change state running to ready for set");
-    pcb.state = "ready";
 }
 function add(pcb, argv){
     pcb.currVarlist.setValue(argv[0],
             pcb.currVarlist.getValue[argv[1]] +
             pcb.currVarlist.getValue[argv[2]]);
-    console.log("process change state running to ready for add");
-    pcb.state = "ready";
 }
 
 
@@ -120,27 +116,30 @@ function add(pcb, argv){
 function exec(pcb) {
     console.log("process change state "+pcb.state+" to running for exec");
     pcb.state = "running";
-    var line = pcb.program[pcb.pc];
-    //line[0] must be a function object && line[1] is the array of arguments for function
-    line[0](pcb, line[1]);
-    //increment pc
-    pcb.pc = pcb.pc + 1; 
-    //end of process file then will delete
-    if(pcb.program.length-1 < pcb.pc) {
-        console.log("process change state running to stop");
-        pcb.state = "stop";
+    while(pcb.state === "running") {
+        var line = pcb.program[pcb.pc];
+        //line[0] must be a function object && line[1] is the array of arguments for function
+        line[0](pcb, line[1]);
+        //increment pc
+        pcb.pc = pcb.pc + 1; 
+        //end of process file then will delete
+        if(pcb.program.length-1 < pcb.pc) {
+            console.log("process change state running to stop");
+            pcb.state = "stop";
+        }
     }
 };
 
 
 function kernel() {
     console.log("kernel started");
-    //execute instructions of ready processes
+    //main kernel loop
     while(!pq.isEmpty()) {
-        //run next ready proc in queue
+        //execute instructions of ready process
         if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
             exec(pq.front());
         }
+        
         //move process to end of queue
         if(!pq.isEmpty() && pq.front().state === "stop") {
             console.log("finished "+ pq.front().pid );
