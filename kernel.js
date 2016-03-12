@@ -98,7 +98,9 @@ function write(pcb, argv){
     pcb.state = "ready";
 }
 function add(pcb, argv){
-    pcb.currVarlist.setValue(argv[0], pcb.currVarlist.getValue[argv[2]] + pcb.currVarlist.getValue[argv[3]]);
+    pcb.currVarlist.setValue(argv[0],
+            pcb.currVarlist.getValue[argv[1]] +
+            pcb.currVarlist.getValue[argv[2]]);
     console.log("process change state running to ready for add");
     pcb.state = "ready";
 }
