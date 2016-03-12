@@ -113,8 +113,6 @@ function exec(pcb) {
 
 function kernel() {
     console.log("kernel started");
-    //load everything
-    load(p1);
     //execute instructions of ready processes
     while(true) {
         //run next ready proc in queue
