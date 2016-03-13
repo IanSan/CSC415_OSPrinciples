@@ -21,6 +21,7 @@ function IORequest(task, pcb, varId, fp, data, size) {
     this.fp = fp;       //file pointer
     this.data = data;
     this.size = size;   //number of chars to read/write
+    this.mode;          //string file access mode
     this.done = false;  //boolean has this request been responded to?
 };
 
