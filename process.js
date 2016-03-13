@@ -43,3 +43,9 @@ function PCB(program, state, pid, parent) {
     this.currVarlist = this.varlist;    //ref to current scope
     this.fileList = new Array();
 }
+PCB.prototype.set = function(identifier, value) {
+    return this.currVarlist.setValue(identifier, value);
+};
+PCB.prototype.get = function(identifier, value) {
+    return this.currVarlist.getValue(identifier);
+};
