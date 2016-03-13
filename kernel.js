@@ -123,7 +123,7 @@ function exec(pcb) {
         //increment pc
         pcb.pc = pcb.pc + 1; 
         //end of process file then will delete
-        if(pcb.program.length-1 < pcb.pc) {
+        if(pcb.pc >= pcb.program.length) {
             console.log("process change state running to stop");
             pcb.state = "stop";
         }
