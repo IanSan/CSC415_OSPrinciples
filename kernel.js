@@ -30,7 +30,10 @@ function ioreturn(ioreq) {
     //update variable assignment
     switch(ioreq.task) {
         case "open":
+            //set _var with FilePointer
             ioreq.pcb.set(ioreq.varId, ioreq.fp);
+            //add file to this process's list of open files
+            ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
@@ -64,7 +67,14 @@ function open(pcb, argv){
 //  [close, [_var filepointer]]
 // Closes file corresponding to filepointer
 function close(pcb, argv){
-
+    //remove file from this process's list of open files
+    var fp = pcb.get(argv[0]);
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            pcb.fileList.splice(i, 1);
+            break;
+        }
+    }
 }
 
 //  [read, [_var filepointer, _var stringBuffer, int size]]
