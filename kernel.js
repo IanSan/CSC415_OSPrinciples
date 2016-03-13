@@ -81,6 +81,18 @@ function close(pcb, argv){
 // Sets buffer with size number of characters starting at where filepointer is
 // at. Increments filepointer to one past the last read character.
 function read(pcb, argv){
+    var fp = pcb.get(argv[0]);
+    var mode;
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            mode = pcb.fileList[i].mode;
+            break;
+        }
+    }
+    if (mode[0] !== "r" && mode[1] !== "+") {
+        console.log("read permission error");
+        return 1;
+    }
     var ioreq = new IORequest("read", pcb);
     ioreq.fp = pcb.get(argv[0]);    //_var filepointer
     ioreq.varId = argv[1];          //_var identifier to be set with string
@@ -95,6 +107,18 @@ function read(pcb, argv){
 // this will replace any existing data at that position. Increments filepointer
 // to one past the last written character.
 function write(pcb, argv){
+    var fp = pcb.get(argv[0]);
+    var mode;
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            mode = pcb.fileList[i].mode;
+            break;
+        }
+    }
+    if (mode === "r") {
+        console.log("write permission error");
+        return 1;
+    }
     var ioreq = new IORequest("write", pcb);
     ioreq.fp = pcb.get(argv[0]);            //_var filepointer
     ioreq.data = pcb.get(argv[1]);          //_var stringBuffer
