@@ -29,10 +29,10 @@ function ioreturn(ioreq) {
     //update variable assignment
     switch(ioreq.task) {
         case "open":
-            ioreq.pcb.currVarlist.setValue(ioreq.varId, ioreq.fp);
+            ioreq.pcb.set(ioreq.varId, ioreq.fp);
             break;
         case "read":
-            ioreq.pcb.currVarlist.setValue(ioreq.varId, ioreq.data);
+            ioreq.pcb.set(ioreq.varId, ioreq.data);
             break;
         case "write":
             break;
@@ -72,7 +72,7 @@ function read(pcb, argv){
     console.log("process change state running to waiting for read");
     fq.push_back(new IORequest("read", pcb,
             argv[2],    //var identifier
-            pcb.currVarlist.getValue(argv[0]),  //fp
+            pcb.get(argv[0]),  //fp
             undefined,  //data
             argv[1]));  //size
     pcb.state = "waiting";
@@ -86,19 +86,19 @@ function write(pcb, argv){
     console.log("process change state running to waiting for write");
     fq.push_back(new IORequest("write", pcb,
             undefined,  //no variable to set
-            pcb.currVarlist.getValue(argv[0]),  //fp
-            pcb.currVarlist.getValue(argv[1]),  //data
-            pcb.currVarlist.getValue(argv[1]).length)); //size
+            pcb.get(argv[0]),  //fp
+            pcb.get(argv[1]),  //data
+            pcb.get(argv[1]).length)); //size
     pcb.state = "waiting";
 }
 
  function set(pcb, argv){
-    pcb.currVarlist.setValue(argv[0], argv[1]);
+    pcb.set(argv[0], argv[1]);
 }
 function add(pcb, argv){
-    pcb.currVarlist.setValue(argv[0],
-            pcb.currVarlist.getValue[argv[1]] +
-            pcb.currVarlist.getValue[argv[2]]);
+    pcb.set(argv[0],
+            pcb.get[argv[1]] +
+            pcb.get[argv[2]]);
 }
 
 
