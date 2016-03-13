@@ -3,6 +3,35 @@ var io = {
     open: function(ioreq) {
         //get fp for given filename
         ioreq.fp = fs.getFilePointer(ioreq.data);
+        switch(ioreq.mode) {
+            case "r":
+            case "r+":
+                //ioreq.fp is undefined if file does not exist
+                break;
+            case "w":
+            case "w+":
+                if (ioreq.fp !== undefined) {
+                    //file exists, delete it
+                    delete fs.data[ioreq.data];
+                }
+                //create new empty file
+                fs.data[ioreq.data] = "";
+                fs.getFilePointer(ioreq.data);
+                break;
+            case "a":
+            case "a+":
+                if (ioreq.fp === undefined) {
+                    //file does not exist, create new file
+                    fs.data[ioreq.data] = "";
+                }
+                //set fp to end of file
+                ioreq.fp = fs.getFilePointer(ioreq.data);
+                ioreq.fp.index = fs.data[ioreq.data].length;
+                break;
+            default:
+                //bad arg
+                break;
+        }
         ioreq.done = true;
         io.ready = true;
     },

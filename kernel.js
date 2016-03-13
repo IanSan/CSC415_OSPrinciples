@@ -14,13 +14,14 @@ function load(program) {
 };
 
 //I/O request object
-function IORequest(task, pcb, varId, fp, data, size) {
+function IORequest(task, pcb) {
     this.task = task;
     this.pcb = pcb;     //ref of requesting process
-    this.varId = varId; //string identifier of variable to be set
-    this.fp = fp;       //file pointer
-    this.data = data;
-    this.size = size;   //number of chars to read/write
+    this.varId;         //string identifier of variable to be set
+    this.fp;            //FilePointer object
+    this.data;
+    this.size;          //int number of chars to read/write
+    this.mode;          //string file access mode
     this.done = false;  //boolean has this request been responded to?
 };
 
@@ -29,7 +30,10 @@ function ioreturn(ioreq) {
     //update variable assignment
     switch(ioreq.task) {
         case "open":
+            //set _var with FilePointer
             ioreq.pcb.set(ioreq.varId, ioreq.fp);
+            //add file to this process's list of open files
+            ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
@@ -51,10 +55,11 @@ function ioreturn(ioreq) {
 //  [open, [string filename, string flags, _var filepointer]]
 // Opens a file called filename with given permission flags and sets filepointer
 function open(pcb, argv){
-    fq.push_back(new IORequest("open", pcb,
-            argv[2],    //var identifier to be set with fp
-            undefined,  //no given fp
-            argv[0]));  //filename
+    var ioreq = new IORequest("open", pcb);
+    ioreq.data = argv[0];   //string filename
+    ioreq.mode = argv[1];   //string file access mode
+    ioreq.varId = argv[2];  //_var identifier to be set with fp
+    fq.push_back(ioreq);
     console.log("process change state running to waiting for open");
     pcb.state = "waiting";
 }
@@ -62,19 +67,38 @@ function open(pcb, argv){
 //  [close, [_var filepointer]]
 // Closes file corresponding to filepointer
 function close(pcb, argv){
-
+    //remove file from this process's list of open files
+    var fp = pcb.get(argv[0]);
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            pcb.fileList.splice(i, 1);
+            break;
+        }
+    }
 }
 
-//  [read, [_var filepointer, int size, _var stringBuffer]]
+//  [read, [_var filepointer, _var stringBuffer, int size]]
 // Sets buffer with size number of characters starting at where filepointer is
 // at. Increments filepointer to one past the last read character.
 function read(pcb, argv){
+    var fp = pcb.get(argv[0]);
+    var mode;
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            mode = pcb.fileList[i].mode;
+            break;
+        }
+    }
+    if (mode[0] !== "r" && mode[1] !== "+") {
+        console.log("read permission error");
+        return 1;
+    }
+    var ioreq = new IORequest("read", pcb);
+    ioreq.fp = pcb.get(argv[0]);    //_var filepointer
+    ioreq.varId = argv[1];          //_var identifier to be set with string
+    ioreq.size = argv[2];           //int size
+    fq.push_back(ioreq);
     console.log("process change state running to waiting for read");
-    fq.push_back(new IORequest("read", pcb,
-            argv[2],    //var identifier
-            pcb.get(argv[0]),  //fp
-            undefined,  //data
-            argv[1]));  //size
     pcb.state = "waiting";
 }
 
@@ -83,12 +107,24 @@ function read(pcb, argv){
 // this will replace any existing data at that position. Increments filepointer
 // to one past the last written character.
 function write(pcb, argv){
+    var fp = pcb.get(argv[0]);
+    var mode;
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            mode = pcb.fileList[i].mode;
+            break;
+        }
+    }
+    if (mode === "r") {
+        console.log("write permission error");
+        return 1;
+    }
+    var ioreq = new IORequest("write", pcb);
+    ioreq.fp = pcb.get(argv[0]);            //_var filepointer
+    ioreq.data = pcb.get(argv[1]);          //_var stringBuffer
+    ioreq.size = pcb.get(argv[1]).length;   //int size
+    fq.push_back(ioreq);
     console.log("process change state running to waiting for write");
-    fq.push_back(new IORequest("write", pcb,
-            undefined,  //no variable to set
-            pcb.get(argv[0]),  //fp
-            pcb.get(argv[1]),  //data
-            pcb.get(argv[1]).length)); //size
     pcb.state = "waiting";
 }
 
