@@ -1,6 +1,6 @@
 function init() {
     //load all processes
-    load(p1);
+    load(calcVectors);
 
     //start kernel
     console.log("kernel starting");
