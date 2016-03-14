@@ -1,5 +1,6 @@
 function init() {
     //load all processes
+    load(classGrade);
     load(calcVectors);
 
     //start kernel

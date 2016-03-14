@@ -75,6 +75,7 @@ function close(pcb, argv){
             break;
         }
     }
+    console.log("process state running for close");
 }
 
 //  [read, [_var filepointer, _var stringBuffer, int size]]
@@ -199,7 +200,6 @@ function kernel() {
             //return data to requesting process & remove io request
             ioreturn(fq.pop_front());
         }
-        
         //because javascript is single-threaded
         //stop this line of execution and then restart it
         //calling kernel() emulates while(!pq.isEmpty()) {...}
