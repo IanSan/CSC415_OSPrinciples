@@ -1,6 +1,6 @@
 function init() {
     //load all processes
-    load(p1);
+    load(classGrade);
 
     //start kernel
     console.log("kernel starting");
