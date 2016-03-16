@@ -16,7 +16,7 @@ var io = {
                 }
                 //create new empty file
                 fs.data[ioreq.data] = "";
-                fs.getFilePointer(ioreq.data);
+                ioreq.fp = fs.getFilePointer(ioreq.data);
                 break;
             case "a":
             case "a+":
