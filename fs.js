@@ -25,6 +25,13 @@ var fs = {
     * Output: the char at filepointer.index within the data of the file named filepointer.filename
     */
     getFileData: function(filepointer) {
+        if(filepointer.filename.substr(0,4) === "dev/") {
+            var char = fs.data[filepointer.filename][filepointer.index];
+            fs.data[filepointer.filename] =
+                    fs.data[filepointer.filename].substr(1);
+            filepointer.index = -1;
+            return char;
+        }
         return fs.data[filepointer.filename][filepointer.index];
     },
     setFileData: function(filepointer, char) {
