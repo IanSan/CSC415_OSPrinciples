@@ -15,6 +15,7 @@
         
         <!-- place processes below here -->
         <script type="text/javascript" src="DisplayDriver.js"></script>
+        <script type="text/javascript" src="KeyboardDriver.js"></script>
         <!-- place processes above here -->
         
         <script type="text/javascript" src="init.js"></script>
@@ -25,9 +26,7 @@
         <div>
         <textarea id="keyboard" onkeypress="
             if(event.keyCode === 13) {
-                var doc = document.getElementById('display');
-                doc.innerHTML = doc.innerHTML + this.value + '<br>';
-                this.value = '';    //clear textarea
+                load(keyboard);
             }"></textarea>
         </div>
     </body>
