@@ -36,16 +36,31 @@ var io = {
         io.ready = true;
     },
     read: function(ioreq) {
-        ioreq.data = new Array();
-        for (var i = 0; i < ioreq.size; i++) {
-            ioreq.data[i] = fs.getFileData(ioreq.fp);
-            ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
-            if(ioreq.fp.eof) {
-                break;
+        var cbuf = new Array();
+        var i;
+        if (ioreq.size > 100) {
+            for (i = 0; i < 100; i++) {
+                cbuf[i] = fs.getFileData(ioreq.fp);
+                ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+                if(ioreq.fp.eof) {
+                    //end reading, return data
+                    ioreq.done = true;
+                    break;
+                }
             }
+        } else {
+            for (i = 0; i < ioreq.size; i++) {
+                cbuf[i] = fs.getFileData(ioreq.fp);
+                ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+                if(ioreq.fp.eof) {
+                    break;
+                }
+            }
+            ioreq.done = true;
         }
-        ioreq.data = ioreq.data.join("");
-        ioreq.done = true;
+        if(ioreq.data === undefined) ioreq.data = "";
+        ioreq.data = ioreq.data + cbuf.join("");
+        ioreq.size = ioreq.size - i;
         io.ready = true;
     }, 
     write: function(ioreq) {
