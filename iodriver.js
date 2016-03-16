@@ -52,6 +52,19 @@ var io = {
         }
         ioreq.done = true;
         io.ready = true;
+    },
+    getline: function(ioreq) {
+        ioreq.data = new Array();
+        for (var i = 0; i < ioreq.size; i++) {
+            ioreq.data[i] = fs.getFileData(ioreq.fp);
+            ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+            if(ioreq.data[i] === '\n') {
+                break;
+            }
+        }
+        ioreq.data = ioreq.data.join("");
+        ioreq.done = true;
+        io.ready = true;
     }
 };
 
@@ -70,6 +83,9 @@ function iodriver(ioreq) {
             break;
         case "close":
             setTimeout(function(){io.close(ioreq);}, Math.random()*1000);
+            break;
+        case "getline":
+            setTimeout(function(){io.getline(ioreq);}, Math.random()*1000);
             break;
     }
 }

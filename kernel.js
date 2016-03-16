@@ -36,6 +36,7 @@ function ioreturn(ioreq) {
             ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
+        case "getline":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
             break;
         case "write":
@@ -125,6 +126,31 @@ function write(pcb, argv){
     ioreq.size = pcb.get(argv[1]).length;   //int size
     fq.push_back(ioreq);
     console.log("process change state running to waiting for write");
+    pcb.state = "waiting";
+}
+
+//  [getline, [_var stringBuffer, int size, _var filepointer]]
+// Reads from file into buffer until a newline is found or size number of
+// characters are read. Newline is included in buffer if one was found.
+function getline(pcb, argv) {
+    var fp = pcb.get(argv[2]);
+    var mode;
+    for (var i = 0; i < pcb.fileList.length; i++) {
+        if (pcb.fileList[i].filepointer === fp) {
+            mode = pcb.fileList[i].mode;
+            break;
+        }
+    }
+    if (mode[0] !== "r" && mode[1] !== "+") {
+        console.log("read permission error");
+        return 1;
+    }
+    var ioreq = new IORequest("getline", pcb);
+    ioreq.varId = argv[0];          //_var identifier to be set with string
+    ioreq.size = argv[1];           //int size
+    ioreq.fp = pcb.get(argv[2]);    //_var filepointer
+    fq.push_back(ioreq);
+    console.log("process change state running to waiting for getline");
     pcb.state = "waiting";
 }
 
