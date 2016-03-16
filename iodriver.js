@@ -40,6 +40,9 @@ var io = {
         for (var i = 0; i < ioreq.size; i++) {
             ioreq.data[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+            if(ioreq.fp.eof) {
+                break;
+            }
         }
         ioreq.data = ioreq.data.join("");
         ioreq.done = true;
@@ -58,7 +61,7 @@ var io = {
         for (var i = 0; i < ioreq.size; i++) {
             ioreq.data[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
-            if(ioreq.data[i] === '\n') {
+            if(ioreq.data[i] === '\n' || ioreq.fp.eof) {
                 break;
             }
         }
