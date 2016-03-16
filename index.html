@@ -20,8 +20,14 @@
         <script>init()</script>
     </head>
     <body>
-        <div id="log">
-            <p>check the console</p>
+        <div id="display"></div>
+        <div>
+        <textarea id="keyboard" onkeypress="
+            if(event.keyCode === 13) {
+                var doc = document.getElementById('display');
+                doc.innerHTML = doc.innerHTML + this.value + '<br>';
+                this.value = '';    //clear textarea
+            }"></textarea>
         </div>
     </body>
 </html>
