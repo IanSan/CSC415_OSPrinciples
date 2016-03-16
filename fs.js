@@ -25,6 +25,9 @@ var fs = {
     * Output: the char at filepointer.index within the data of the file named filepointer.filename
     */
     getFileData: function(filepointer) {
+        if (filepointer.index >=  fs.data[filepointer.filename].length) {
+            filepointer.eof = -1;
+        }
         return fs.data[filepointer.filename][filepointer.index];
     },
     setFileData: function(filepointer, char) {
