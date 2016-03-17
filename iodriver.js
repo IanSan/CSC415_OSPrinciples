@@ -64,11 +64,21 @@ var io = {
         io.ready = true;
     }, 
     write: function(ioreq) {
-        for (var i = 0; i < ioreq.size; i++) {
-            fs.setFileData(ioreq.fp, ioreq.data[i]);
-            ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+        var i;
+        if (ioreq.size > 100) {
+            for (i = 0; i < 100; i++) {
+                fs.setFileData(ioreq.fp, ioreq.data[i]);
+                ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+            }
+            ioreq.data = ioreq.data.substr(i);  //remove portion already written
+            ioreq.size = ioreq.size - i;
+        } else {
+            for (i = 0; i < ioreq.size; i++) {
+                fs.setFileData(ioreq.fp, ioreq.data[i]);
+                ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
+            }
+            ioreq.done = true;
         }
-        ioreq.done = true;
         io.ready = true;
     },
     getline: function(ioreq) {
