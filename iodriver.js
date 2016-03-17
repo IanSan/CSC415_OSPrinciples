@@ -108,21 +108,22 @@ var io = {
 //setTimeout(function, time-ms) after the time in millisec pass the function will trigger
 function iodriver(ioreq) {
     io.ready = false;
+    var delay = Math.random()*1000;
     switch(ioreq.task) {
         case "open":
-            setTimeout(function(){io.open(ioreq);}, Math.random()*1000);
+            setTimeout(function(){io.open(ioreq);}, delay);
             break;
         case "read":
-            setTimeout(function(){io.read(ioreq);}, Math.random()*1000);
+            setTimeout(function(){io.read(ioreq);}, delay);
             break;
         case "write":
-            setTimeout(function(){io.write(ioreq);}, Math.random()*1000);
+            setTimeout(function(){io.write(ioreq);}, delay);
             break;
         case "close":
-            setTimeout(function(){io.close(ioreq);}, Math.random()*1000);
+            setTimeout(function(){io.close(ioreq);}, delay);
             break;
         case "getline":
-            setTimeout(function(){io.getline(ioreq);}, Math.random()*1000);
+            setTimeout(function(){io.getline(ioreq);}, delay);
             break;
     }
 }
