@@ -1,5 +1,6 @@
 var io = {
     ready: true,
+    TRANSPORT_LIMIT: 100,   //number of chars a single delivery can handle
     open: function(ioreq) {
         //get fp for given filename
         ioreq.fp = fs.getFilePointer(ioreq.data);
@@ -38,8 +39,8 @@ var io = {
     read: function(ioreq) {
         var cbuf = new Array();
         var i;
-        if (ioreq.size > 100) {
-            for (i = 0; i < 100; i++) {
+        if (ioreq.size > TRANSPORT_LIMIT) {
+            for (i = 0; i < TRANSPORT_LIMIT; i++) {
                 cbuf[i] = fs.getFileData(ioreq.fp);
                 ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
                 if(ioreq.fp.eof) {
@@ -65,8 +66,8 @@ var io = {
     }, 
     write: function(ioreq) {
         var i;
-        if (ioreq.size > 100) {
-            for (i = 0; i < 100; i++) {
+        if (ioreq.size > TRANSPORT_LIMIT) {
+            for (i = 0; i < TRANSPORT_LIMIT; i++) {
                 fs.setFileData(ioreq.fp, ioreq.data[i]);
                 ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
             }
@@ -84,7 +85,7 @@ var io = {
     getline: function(ioreq) {
         var cbuf = new Array();
         var i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < TRANSPORT_LIMIT; i++) {
             cbuf[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
             if(i === ioreq.size - 1||
@@ -94,7 +95,7 @@ var io = {
                 break;
             }
         }
-        if (i === 100 && ioreq.done === false) {
+        if (i === TRANSPORT_LIMIT && ioreq.done === false) {
             ioreq.size = ioreq.size - i;    //read is not finished
         }
         //append received data into the IORequest
