@@ -11,5 +11,6 @@ function FileStruct(filepointer, mode) {
 function FilePointer(filename, index) {
     this.filename = filename;                       //string filename
     this.index = index === undefined ? 0 : index;   //int
+    this.eof = 0;                                   //int sets to -1 if EOF
 }
 
