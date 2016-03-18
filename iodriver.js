@@ -39,8 +39,8 @@ var io = {
     read: function(ioreq) {
         var cbuf = new Array();
         var i;
-        if (ioreq.size > TRANSPORT_LIMIT) {
-            for (i = 0; i < TRANSPORT_LIMIT; i++) {
+        if (ioreq.size > io.TRANSPORT_LIMIT) {
+            for (i = 0; i < io.TRANSPORT_LIMIT; i++) {
                 cbuf[i] = fs.getFileData(ioreq.fp);
                 ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
                 if(ioreq.fp.eof) {
@@ -66,8 +66,8 @@ var io = {
     }, 
     write: function(ioreq) {
         var i;
-        if (ioreq.size > TRANSPORT_LIMIT) {
-            for (i = 0; i < TRANSPORT_LIMIT; i++) {
+        if (ioreq.size > io.TRANSPORT_LIMIT) {
+            for (i = 0; i < io.TRANSPORT_LIMIT; i++) {
                 fs.setFileData(ioreq.fp, ioreq.data[i]);
                 ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
             }
@@ -85,7 +85,7 @@ var io = {
     getline: function(ioreq) {
         var cbuf = new Array();
         var i;
-        for (i = 0; i < TRANSPORT_LIMIT; i++) {
+        for (i = 0; i < io.TRANSPORT_LIMIT; i++) {
             cbuf[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
             if(i === ioreq.size - 1||
@@ -95,7 +95,7 @@ var io = {
                 break;
             }
         }
-        if (i === TRANSPORT_LIMIT && ioreq.done === false) {
+        if (i === io.TRANSPORT_LIMIT && ioreq.done === false) {
             ioreq.size = ioreq.size - i;    //read is not finished
         }
         //append received data into the IORequest
