@@ -10,15 +10,14 @@ var shell = [
     [function(pcb, argv) {
             if(pcb.get("buffer").length === 0)
                 return;
-            var args = pcb.get("buffer")
-                    .substr(0, pcb.get("buffer").length-1).split(" ");
+            var args = pcb.get("buffer").substr(0, pcb.get("buffer").length-1).split(" ");
             var str = "";
-            
             //find file in filesystem and execute, pass arguments
             //load(fs.data[args[0]]);
             
-            //the above is not functional
-            //temporarily, just interpret commmands here
+            //args[0] Command Instruction , arg[1] for string 
+            str += args[0](args[1]);
+
             switch(args[0]) {
                 case "echo":
                     for (var i = 1; i < args.length; i++) {

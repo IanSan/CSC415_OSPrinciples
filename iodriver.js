@@ -102,6 +102,16 @@ var io = {
         if(ioreq.data === undefined) ioreq.data = "";
         ioreq.data = ioreq.data + cbuf.join("");
         io.ready = true;
+    },
+
+    fileList: function(ioreq){
+        io.ready = false; 
+        var filebuff = new Array();
+        for(var file in fs.data){
+            filebuff+= (file+'\n');
+        }
+        ioreq.data(filebuff);
+        io.ready = true;
     }
 };
 
@@ -124,6 +134,9 @@ function iodriver(ioreq) {
             break;
         case "getline":
             setTimeout(function(){io.getline(ioreq);}, delay);
+            break;
+        case "fileList":
+            setTimeout(function(){io.fileList(ioreq);}, delay);
             break;
     }
 }

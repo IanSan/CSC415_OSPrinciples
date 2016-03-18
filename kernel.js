@@ -36,6 +36,7 @@ function ioreturn(ioreq) {
             ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
+
         case "getline":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
             break;
@@ -163,19 +164,8 @@ function add(pcb, argv){
             pcb.get[argv[1]] +
             pcb.get[argv[2]]);
 }
-
-
-
 //=============================================================
-
 //execute process instruction
-/** structure of process code should be the following: 
-* open-theCMD, desiredFile, fileFlag, addressOfLocation
-* read-theCMD, addressofLocation, null, desiredDestination
-* write 
-* close 
-* add
-*/
 function exec(pcb) {
     console.log("process change state "+pcb.state+" to running for exec");
     pcb.state = "running";
@@ -193,47 +183,32 @@ function exec(pcb) {
     }
 };
 
-
+//main kernel loop
 function kernel() {
-    //main kernel loop
-    //while(!pq.isEmpty()) {
-        //execute instructions of ready process
-        if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
-            exec(pq.front());
-        }
-        
-        //move process to end of queue
-        if(!pq.isEmpty() && pq.front().state === "stop") {
-            console.log("finished "+ pq.front().pid );
-            pq.pop_front();
-        } else {
-            pq.push_back(pq.pop_front());
-        }
-        
-        //unload finished processes
-        while(!pq.isEmpty() && pq.front().state === "stop") {
-            console.log("finished "+ pq.front().pid );
-            pq.pop_front();
-        }
-        
-        //run io driver
-        while(io.ready && !fq.isEmpty() && !fq.front().done) {
-            iodriver(fq.front());
-        }
-
-        //return finished io requests
-        while(!fq.isEmpty() && fq.front().done) {
-            //return data to requesting process & remove io request
-            ioreturn(fq.pop_front());
-        }
-        
-        setTimeout(function(){kernel();}, 0);
-        //because javascript is single-threaded
-        //stop this line of execution and then restart it
-        //calling kernel() emulates while(!pq.isEmpty()) {...}
-        /*if(pq.isEmpty()) {
-            console.log("all processes stopped, kernel stopped");
-        } else {
-        }*/
-    //}
+    //execute instructions of ready process
+    if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
+        exec(pq.front());
+    }
+    //move process to end of queue
+    if(!pq.isEmpty() && pq.front().state === "stop") {
+        console.log("finished "+ pq.front().pid );
+        pq.pop_front();
+    } else {
+        pq.push_back(pq.pop_front());
+    }
+    //unload finished processes
+    while(!pq.isEmpty() && pq.front().state === "stop") {
+        console.log("finished "+ pq.front().pid );
+        pq.pop_front();
+    }
+    //run io driver
+    while(io.ready && !fq.isEmpty() && !fq.front().done) {
+        iodriver(fq.front());
+    }
+    //return finished io requests
+    while(!fq.isEmpty() && fq.front().done) {
+        //return data to requesting process & remove io request
+        ioreturn(fq.pop_front());
+    }
+    setTimeout(function(){kernel();}, 0);
 };
