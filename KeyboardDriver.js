@@ -2,7 +2,8 @@
 fs.data["dev/input"] = "";
 
 var keyboard = [
-    [open, ["dev/input", "w", "fp"]],   //create device dev/input
+    [set, ["filename", "dev/input"]],
+    [open, ["filename", "w", "fp"]],   //create device dev/input
     [function(pcb, argv) {
             var doc = document.getElementById('keyboard');
             var str = doc.value;

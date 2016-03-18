@@ -53,11 +53,12 @@ function ioreturn(ioreq) {
 // some definitions for our own sanity
 // _var : a string in user programs, but interpreted as a variable identifier
 
-//  [open, [string filename, string flags, _var filepointer]]
-// Opens a file called filename with given permission flags and sets filepointer
+//  [open, [_var filename, string flags, _var filepointer]]
+// Opens a file with the name set in _var filename with given permission flags
+// and sets filepointer
 function open(pcb, argv){
     var ioreq = new IORequest("open", pcb);
-    ioreq.data = argv[0];   //string filename
+    ioreq.data = pcb.get(argv[0]);   //_var filename
     ioreq.mode = argv[1];   //string file access mode
     ioreq.varId = argv[2];  //_var identifier to be set with fp
     fq.push_back(ioreq);

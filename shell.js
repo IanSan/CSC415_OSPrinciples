@@ -1,6 +1,8 @@
 var shell = [
-    [open, ["dev/input", "r", "fp"]],
-    [open, ["dev/tty0", "r+", "fp2"]],
+    [set, ["filename", "dev/input"]],
+    [open, ["filename", "r", "fp"]],
+    [set, ["filename", "dev/tty0"]],
+    [open, ["filename", "r+", "fp2"]],
 //loop
     [read, ["fp", "buffer", 100]],
     [write, ["fp2", "buffer"]], //echo keystrokes
