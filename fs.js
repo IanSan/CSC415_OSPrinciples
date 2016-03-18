@@ -28,6 +28,13 @@ var fs = {
         if (filepointer.index >=  fs.data[filepointer.filename].length) {
             filepointer.eof = -1;
         }
+        if(filepointer.filename.substr(0,4) === "dev/") {
+            var char = fs.data[filepointer.filename][filepointer.index];
+            fs.data[filepointer.filename] =
+                    fs.data[filepointer.filename].substr(1);
+            filepointer.index = -1;
+            return char;
+        }
         return fs.data[filepointer.filename][filepointer.index];
     },
     setFileData: function(filepointer, char) {

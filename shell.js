@@ -1,0 +1,37 @@
+var shell = [
+    [open, ["dev/input", "r", "fp"]],
+    [open, ["dev/tty0", "r+", "fp2"]],
+//loop
+    [read, ["fp", "buffer", 100]],
+    [write, ["fp2", "buffer"]], //echo keystrokes
+    //process command
+    [function(pcb, argv) {
+            if(pcb.get("buffer").length === 0)
+                return;
+            var args = pcb.get("buffer")
+                    .substr(0, pcb.get("buffer").length-1).split(" ");
+            var str = "";
+            
+            //find file in filesystem and execute, pass arguments
+            //load(fs.data[args[0]]);
+            
+            //the above is not functional
+            //temporarily, just interpret commmands here
+            switch(args[0]) {
+                case "echo":
+                    for (var i = 1; i < args.length; i++) {
+                        str = str + args[i];
+                    }
+                    break;
+                default:
+                    str = args[0] + " is not a valid command\n";
+                    break;
+            }
+            pcb.set("buffer", str);
+    }, []],
+    [write, ["fp2", "buffer"]],
+//goto loop
+    [function(pcb, argv) {
+            pcb.pc = 1; //next instr 2
+    }, []]
+];

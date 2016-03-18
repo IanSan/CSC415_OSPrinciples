@@ -226,13 +226,13 @@ function kernel() {
             ioreturn(fq.pop_front());
         }
         
+        setTimeout(function(){kernel();}, 0);
         //because javascript is single-threaded
         //stop this line of execution and then restart it
         //calling kernel() emulates while(!pq.isEmpty()) {...}
-        if(pq.isEmpty()) {
+        /*if(pq.isEmpty()) {
             console.log("all processes stopped, kernel stopped");
         } else {
-            setTimeout(function(){kernel();}, 0);
-        }
+        }*/
     //}
 };

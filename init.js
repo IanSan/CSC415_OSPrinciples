@@ -1,6 +1,7 @@
 function init() {
     //load all processes
-    load(p1);
+    load(display);
+    load(shell);
 
     //start kernel
     console.log("kernel starting");
