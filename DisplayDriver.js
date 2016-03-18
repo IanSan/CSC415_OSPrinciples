@@ -1,5 +1,5 @@
 //occasionally flushes tty0 and prints to display (html)
-var echo = [
+var display = [
     [open, ["dev/tty0", "w", "fp"]],   //create device dev/ttyS0
     [close, ["fp"]],
     [open, ["dev/tty0", "r", "fp"]],
