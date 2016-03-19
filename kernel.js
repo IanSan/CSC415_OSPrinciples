@@ -200,7 +200,7 @@ function exec(pcb) {
         //end of process file then will delete
         if(pcb.pc >= pcb.program.length) {
             console.log("process change state running to stop");
-            pcb.state = "stop";
+            pcb.stop();
         }
     }
 };

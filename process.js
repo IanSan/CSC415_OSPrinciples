@@ -64,3 +64,14 @@ PCB.prototype.initializeVarlist = function(argv) {
 PCB.prototype.createChild = function(program, state, pid, argv) {
     return new PCB(program, state, pid, this, argv);
 };
+PCB.prototype.stop = function() {
+    this.state = "stop";
+    if (this.parent !== undefined) {
+        for (var i = 0; i < this.parent.children.length; i++) {
+            if (this.parent.children[i] === this) {
+                this.parent.children.splice(i, 1);
+                break;
+            }
+        }
+    }
+};
