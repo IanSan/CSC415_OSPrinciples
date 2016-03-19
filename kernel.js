@@ -164,6 +164,18 @@ function add(pcb, argv){
             pcb.get[argv[2]]);
 }
 
+//  [createChildProcess, [_var argv]]
+// Creates child process, executing the program with filename given in _var
+// argv[0]. All argument argv are passed to the new process.
+function createChildProcess(pcb, argv) {
+    argv = pcb.get(argv);
+    if(fs.data[argv[0]] === undefined) {
+        return;
+    }
+    var program = fs.data[argv[0]];
+    var child = pcb.createChild(program, "ready", programCounter++, argv);
+    pq.push_back(child);
+}
 
 
 //=============================================================
