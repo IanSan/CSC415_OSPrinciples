@@ -1,8 +1,8 @@
 function init() {
     //load all processes
-    load(display);
-    load(keyboard);
-    load(shell);
+    load(display, "display");
+    load(keyboard, "keyboard");
+    load(shell, "shell");
 
     //start kernel
     console.log("kernel starting");

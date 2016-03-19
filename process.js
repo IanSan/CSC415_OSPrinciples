@@ -30,9 +30,10 @@ varlist.prototype.getValue = function(identifier, scope) {
 
 
 //process control block object
-function PCB(program, state, pid, parent, argv) {
+function PCB(program, name, state, pid, parent, argv) {
     this.program = program; //program code
-    this.state = state;    //string process state
+    this.name = name;       //program name
+    this.state = state;     //string process state
     this.pc = 0;            //integer program counter
     this.pid = pid;         //integer process id
     this.mode = 0;          //user/kernel mode
@@ -61,8 +62,8 @@ PCB.prototype.initializeVarlist = function(argv) {
         this.set("stderr", this.parent.get("stderr"));
     }
 };
-PCB.prototype.createChild = function(program, state, pid, argv) {
-    return new PCB(program, state, pid, this, argv);
+PCB.prototype.createChild = function(program, name, state, pid, argv) {
+    return new PCB(program, name, state, pid, this, argv);
 };
 PCB.prototype.stop = function() {
     this.state = "stop";
@@ -74,4 +75,7 @@ PCB.prototype.stop = function() {
             }
         }
     }
+};
+PCB.prototype.toString = function() {
+    return "" + this.pid + " " + this.name;
 };

@@ -6,9 +6,9 @@ var fq = new Queue();
 
 //create new process
 var programCounter = 0;
-function load(program) {
-    pq.push_back(new PCB(program, "start", programCounter, undefined));
-    console.log("start process"+ programCounter);
+function load(program, name) {
+    pq.push_back(new PCB(program, name, "start", programCounter, undefined));
+    console.log("start " + programCounter + " " + name);
     console.log(pq.tail.object.program);
     programCounter++;
 };
@@ -63,7 +63,7 @@ function open(pcb, argv){
     ioreq.mode = argv[1];   //string file access mode
     ioreq.varId = argv[2];  //_var identifier to be set with fp
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for open");
+    console.log(pcb.toString() + " running to waiting for open");
     pcb.state = "waiting";
 }
 
@@ -101,7 +101,7 @@ function read(pcb, argv){
     ioreq.varId = argv[1];          //_var identifier to be set with string
     ioreq.size = argv[2];           //int size
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for read");
+    console.log(pcb.toString() + " running to waiting for read");
     pcb.state = "waiting";
 }
 
@@ -127,7 +127,7 @@ function write(pcb, argv){
     ioreq.data = pcb.get(argv[1]);          //_var stringBuffer
     ioreq.size = pcb.get(argv[1]).length;   //int size
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for write");
+    console.log(pcb.toString() + " running to waiting for write");
     pcb.state = "waiting";
 }
 
@@ -152,7 +152,7 @@ function getline(pcb, argv) {
     ioreq.size = argv[1];           //int size
     ioreq.fp = pcb.get(argv[2]);    //_var filepointer
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for getline");
+    console.log(pcb.toString() + " running to waiting for getline");
     pcb.state = "waiting";
 }
 
@@ -174,15 +174,16 @@ function createChildProcess(pcb, argv) {
         return;
     }
     var program = fs.data[argv[0]];
-    var child = pcb.createChild(program, "ready", programCounter++, argv);
+    var child = pcb.createChild(program, argv[0], "start", programCounter++, argv);
     pq.push_back(child);
+    console.log("start " + child.toString());
 }
 
 
 //=============================================================
 //execute process instruction
 function exec(pcb) {
-    console.log("process change state "+pcb.state+" to running for exec");
+    console.log(pcb.toString() + " "+pcb.state+" to running");
     pcb.state = "running";
     while(pcb.state === "running") {
         var line = pcb.program[pcb.pc];
@@ -192,7 +193,7 @@ function exec(pcb) {
         pcb.pc = pcb.pc + 1; 
         //end of process file then will delete
         if(pcb.pc >= pcb.program.length) {
-            console.log("process change state running to stop");
+            console.log(pcb.toString() + "stopping");
             pcb.stop();
         }
     }
