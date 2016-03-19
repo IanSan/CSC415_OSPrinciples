@@ -16,6 +16,6 @@ var display = [
     }, []],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 2; //next instr 3
+            pcb.pc = 3; //next instr 4
     }, []]
 ];
