@@ -11,7 +11,7 @@ var shell = [
     //parse input, split tokens by whitespace and store in "argv"
     [function(pcb, argv) {
             if(pcb.get("buffer").length === 0) {
-                pcb.pc = 3;
+                pcb.pc = 4; //next instr 5, goto loop
                 return;
             }
             var args = pcb.get("buffer").split(/[ \n]+/);
@@ -42,13 +42,23 @@ var shell = [
     [write, ["fp2", "buffer"]],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 3; //next instr 2
+            pcb.pc = 4; //next instr 5
     }, []],
 //execute
     //find file in filesystem and execute, pass arguments
     [createChildProcess, ["argv"]],
+    //wait for child to finish
+    [function(pcb, argv) {
+            if(pcb.children.length > 0) {
+                pcb.state = "waiting";
+                pcb.pc = pcb.pc - 1;    //this instr
+                setTimeout(function() { pcb.state = "ready"; }, 50);
+            }
+    }, []],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 3; //next instr 2
+            pcb.pc = 4; //next instr 5
     }, []]
 ];
+
+fs.data["shell"] = shell;
