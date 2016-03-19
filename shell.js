@@ -6,33 +6,48 @@ var shell = [
 //loop
     [read, ["fp", "buffer", 100]],
     [write, ["fp2", "buffer"]], //echo keystrokes
-    //process command
+    [set, ["argv", ""]],    //argv for process to be executed
+    //parse input, split tokens by whitespace and store in "argv"
     [function(pcb, argv) {
-            if(pcb.get("buffer").length === 0)
+            if(pcb.get("buffer").length === 0) {
+                pcb.pc = 3;
                 return;
-            var args = pcb.get("buffer").substr(0, pcb.get("buffer").length-1).split(" ");
-            var str = "";
-            //find file in filesystem and execute, pass arguments
-            //load(fs.data[args[0]]);
-            
-            //args[0] Command Instruction , arg[1] for string 
-            str += args[0](args[1]);
-
-            switch(args[0]) {
-                case "echo":
-                    for (var i = 1; i < args.length; i++) {
-                        str = str + args[i];
-                    }
-                    break;
-                default:
-                    str = args[0] + " is not a valid command\n";
-                    break;
             }
-            pcb.set("buffer", str);
+            var args = pcb.get("buffer").split(/[ \n]+/);
+            pcb.set("argv", args);
+    }, []],
+    //validate tokens, "argv"[0] should be a valid command
+    [function(pcb, argv) {
+            var command = pcb.get("argv")[0];
+            if(command.length === 0) {
+                //empty string
+                pcb.set("buffer", "");
+            } else if(command in fs.data) {
+                //executable file
+                pcb.set("buffer", "");
+                pcb.pc = pcb.pc + 2;    //goto execute
+            } else {
+                var str = "";
+                //interpret shell-specific commmands here
+                switch(command) {
+                    case "exit":
+                    default:
+                        str = command + ": command not found\n";
+                        break;
+                }
+                pcb.set("buffer", str);
+            }
     }, []],
     [write, ["fp2", "buffer"]],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 1; //next instr 2
+            pcb.pc = 3; //next instr 2
+    }, []],
+//execute
+    //find file in filesystem and execute, pass arguments
+    [createChildProcess, ["argv"]],
+//goto loop
+    [function(pcb, argv) {
+            pcb.pc = 3; //next instr 2
     }, []]
 ];
