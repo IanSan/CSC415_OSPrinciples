@@ -118,7 +118,7 @@ var io = {
 //setTimeout(function, time-ms) after the time in millisec pass the function will trigger
 function iodriver(ioreq) {
     io.ready = false;
-    var delay = Math.random()*1000;
+    var delay = Math.random()*10;
     switch(ioreq.task) {
         case "open":
             setTimeout(function(){io.open(ioreq);}, delay);
