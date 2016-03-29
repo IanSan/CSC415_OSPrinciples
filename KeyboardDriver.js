@@ -6,6 +6,9 @@ var keyboard = [
     [function(pcb, argv) {
             var textarea = document.createElement("textarea");
             textarea.id = "keyboard";
+            textarea.placeholder = "Type command here";
+            textarea.autofocus = true;
+            textarea.cols = 1;
             textarea.onkeypress =
                     function(event) {
                         if (event.keyCode === 13) { //wait for 'Enter' keypress
@@ -13,6 +16,7 @@ var keyboard = [
                         }
                     };
             var div = document.createElement("div");
+            div.id = "currentLine";
             div.appendChild(textarea);
             document.body.appendChild(div);
             pcb.state = "waiting";  //wait for keypress event
@@ -24,7 +28,7 @@ var keyboard = [
             doc.value = "";    //clear textarea
             pcb.set("buffer", str);
     }, []],
-    [write, ["fp", "buffer", 100]],
+    [write, ["fp", "buffer"]],
     [function(pcb, argv) {
             pcb.pc = 2; //next instr 3
             pcb.state = "waiting";

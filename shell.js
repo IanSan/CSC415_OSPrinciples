@@ -5,13 +5,15 @@ var shell = [
     [set, ["stderr", "dev/tty0"]],
     [open, ["stdout", "r+", "fp2"]],
 //loop
+    [set, ["prompt", "user@jsos / $\n"]],
+    [write, ["fp2", "prompt"]],
     [read, ["fp", "buffer", 100]],
     [write, ["fp2", "buffer"]], //echo keystrokes
     [set, ["argv", ""]],    //argv for process to be executed
     //parse input, split tokens by whitespace and store in "argv"
     [function(pcb, argv) {
             if(pcb.get("buffer").length === 0) {
-                pcb.pc = 4; //next instr 5, goto loop
+                pcb.pc = 6; //next instr 7
                 return;
             }
             var args = pcb.get("buffer").split(/[ \n]+/);
