@@ -31,22 +31,22 @@ var fs = {
     */
     getFileData: function(filepointer) {
         if(filepointer.filename.substr(0,5) === "/dev/") {
-            var char = fs.data[filepointer.filename][filepointer.index];
-            fs.data[filepointer.filename] =
-                    fs.data[filepointer.filename].substr(1);
+            var char = fs.data[filepointer.filename].data[filepointer.index];
+            fs.data[filepointer.filename].data =
+                    fs.data[filepointer.filename].data.substr(1);
             filepointer.index = -1;
             return char;
         }
-        if (filepointer.index >=  fs.data[filepointer.filename].length) {
+        if (filepointer.index >=  fs.data[filepointer.filename].data.length) {
             filepointer.eof = -1;
         }
-        return fs.data[filepointer.filename][filepointer.index];
+        return fs.data[filepointer.filename].data[filepointer.index];
     },
     setFileData: function(filepointer, char) {
-        fs.data[filepointer.filename] =
-                fs.data[filepointer.filename].substr(0,filepointer.index) +
+        fs.data[filepointer.filename].data =
+                fs.data[filepointer.filename].data.substr(0,filepointer.index) +
                 char +
-                fs.data[filepointer.filename].substr(filepointer.index+1);
+                fs.data[filepointer.filename].data.substr(filepointer.index+1);
     },
 
 };
