@@ -1,6 +1,6 @@
 //occasionally flushes tty0 and prints to display (html)
 var display = [
-    [set, ["filename", "dev/tty0"]],
+    [set, ["filename", "/dev/tty0"]],
     [open, ["filename", "w", "fp"]],   //create device dev/ttyS0
     [close, ["fp"]],
     [open, ["filename", "r", "fp"]],
