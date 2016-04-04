@@ -1,10 +1,15 @@
+function FileObject(meta, data) {
+    this.meta = meta;
+    this.data = data;
+}
+
 var fs = {
     data: {
-        "stdin": "this is from stdin",
-        "stdout": "",
-        "stderr": "",
-        "file1.csv": "abcdef",
-        "file2.csv": "ghijkl"
+        "/dev": new FileObject("drw-rw-rw-"),
+    },
+    
+    put: function(path, data) {
+        this.data[path] = new FileObject("-rw-rw-rw-", data);
     },
     
     /**
@@ -25,7 +30,7 @@ var fs = {
     * Output: the char at filepointer.index within the data of the file named filepointer.filename
     */
     getFileData: function(filepointer) {
-        if(filepointer.filename.substr(0,4) === "dev/") {
+        if(filepointer.filename.substr(0,5) === "/dev/") {
             var char = fs.data[filepointer.filename][filepointer.index];
             fs.data[filepointer.filename] =
                     fs.data[filepointer.filename].substr(1);
