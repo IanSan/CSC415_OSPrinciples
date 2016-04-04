@@ -21,11 +21,12 @@ var shell = [
     }, []],
     //validate tokens, "argv"[0] should be a valid command
     [function(pcb, argv) {
-            var command = pcb.get("argv")[0];
+            var args = pcb.get("argv");
+            var command = args[0];
             if(command.length === 0) {
                 //empty string
                 pcb.set("buffer", "");
-            } else if(command in fs.data) {
+            } else if((pcb.workingdir + command) in fs.data) {
                 //executable file
                 pcb.set("buffer", "");
                 pcb.pc = pcb.pc + 2;    //goto execute

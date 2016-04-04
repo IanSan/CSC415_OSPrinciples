@@ -170,6 +170,7 @@ function add(pcb, argv){
 // argv[0]. All argument argv are passed to the new process.
 function createChildProcess(pcb, argv) {
     argv = pcb.get(argv);
+    argv[0] = pcb.workingdir + argv[0];
     if(fs.data[argv[0]] === undefined) {
         return;
     }
