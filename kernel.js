@@ -180,6 +180,14 @@ function createChildProcess(pcb, argv) {
     console.log("start " + child.toString());
 }
 
+//  [chdir, [string path]]
+// Changes the current working directory of the calling process to the
+// directory specified in path
+function chdir(pcb, argv) {
+    if (argv[0] in fs.data) {
+        pcb.workingdir = argv[0];
+    }
+}
 
 //=============================================================
 //execute process instruction
