@@ -173,7 +173,7 @@ function createChildProcess(pcb, argv) {
     if(fs.data[argv[0]] === undefined) {
         return;
     }
-    var program = fs.data[argv[0]];
+    var program = fs.data[argv[0]].data;
     var child = pcb.createChild(program, argv[0], "start", programCounter++, argv);
     pq.push_back(child);
     console.log("start " + child.toString());
