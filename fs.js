@@ -5,6 +5,7 @@ function FileObject(meta, data) {
 
 var fs = {
     data: {
+        "/": new FileObject("drw-rw-rw-"),
         "/dev": new FileObject("drw-rw-rw-"),
     },
     
