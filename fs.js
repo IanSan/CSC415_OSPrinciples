@@ -4,7 +4,7 @@ var fs = {
     }),
     
     //puts data into contents of a new file at specificed path (absolute)
-    put: function(path, data) {
+    put: function(path, data, meta) {
         //resolve/create path
         if (path[0] !== "/") {
             //only absolute paths
@@ -28,7 +28,10 @@ var fs = {
             currDir = currDir.data[path[i]];
             i++;
         }
-        currDir.data[path[i]] = new FileObject("-rw-rw-rw-", data);
+        if (meta === undefined) {
+            meta = "-rw-rw-rw-";
+        }
+        currDir.data[path[i]] = new FileObject(meta, data);
     },
     
     //returns FileObject at specified path (absolute)
