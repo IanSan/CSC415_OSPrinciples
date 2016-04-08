@@ -4,6 +4,7 @@ var fs = {
     }),
     
     //puts data into contents of a new file at specificed path (absolute)
+    //file is not overwritten if name already exists
     put: function(path, data, meta) {
         //resolve/create path
         if (path[0] !== "/") {
@@ -28,10 +29,12 @@ var fs = {
             currDir = currDir.data[path[i]];
             i++;
         }
-        if (meta === undefined) {
-            meta = "-rw-rw-rw-";
+        if (!(path[i] in currDir.data)) {
+            if (meta === undefined) {
+                meta = "-rw-rw-rw-";
+            }
+            currDir.data[path[i]] = new FileObject(meta, data);
         }
-        currDir.data[path[i]] = new FileObject(meta, data);
     },
     
     //returns FileObject at specified path (absolute)
