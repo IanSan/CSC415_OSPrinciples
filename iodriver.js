@@ -118,7 +118,13 @@ var io = {
         fs.remove(ioreq.data);
         ioreq.done = true;
         io.ready = true;
-    }
+    },
+    
+    mkdir: function(ioreq) {
+        fs.mkdir(ioreq.data);
+        ioreq.done = true;
+        io.ready = true;
+    },
 };
 
 //setTimeout(function, time-ms) after the time in millisec pass the function will trigger
@@ -146,6 +152,9 @@ function iodriver(ioreq) {
             break;
         case "remove":
             setTimeout(function(){io.remove(ioreq);}, delay);
+            break;
+        case "mkdir":
+            setTimeout(function(){io.mkdir(ioreq);}, delay);
             break;
     }
 }
