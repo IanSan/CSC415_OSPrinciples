@@ -13,21 +13,21 @@ var io = {
             case "w+":
                 if (ioreq.fp !== undefined) {
                     //file exists, delete it
-                    delete fs.data[ioreq.data];
+                    fs.remove(ioreq.data);
                 }
                 //create new empty file
-                fs.data[ioreq.data] = "";
+                fs.put(ioreq.data, "");
                 ioreq.fp = fs.getFilePointer(ioreq.data);
                 break;
             case "a":
             case "a+":
                 if (ioreq.fp === undefined) {
                     //file does not exist, create new file
-                    fs.data[ioreq.data] = "";
+                    fs.put(ioreq.data, "");
                 }
                 //set fp to end of file
                 ioreq.fp = fs.getFilePointer(ioreq.data);
-                ioreq.fp.index = fs.data[ioreq.data].length;
+                ioreq.fp.index = ioreq.fp.fileObject.data.length;
                 break;
             default:
                 //bad arg
