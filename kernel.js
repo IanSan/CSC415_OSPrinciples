@@ -170,11 +170,16 @@ function add(pcb, argv){
 // argv[0]. All argument argv are passed to the new process.
 function createChildProcess(pcb, argv) {
     argv = pcb.get(argv);
-    if(fs.data[argv[0]] === undefined) {
+    var path = argv[0];
+    if (path[0] !== "/") {
+        path = pcb.workingdir + path;
+    }
+    var program = fs.getFile(path);
+    if (program === undefined) {
         return;
     }
-    var program = fs.data[argv[0]];
-    var child = pcb.createChild(program, argv[0], "start", programCounter++, argv);
+    
+    var child = pcb.createChild(program.data, argv[0], "start", programCounter++, argv);
     pq.push_back(child);
     console.log("start " + child.toString());
 }
