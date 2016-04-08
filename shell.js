@@ -25,7 +25,8 @@ var shell = [
             if(command.length === 0) {
                 //empty string
                 pcb.set("buffer", "");
-            } else if(command in fs.data) {
+            } else if ((fs.getFile(command) !== undefined) ||
+                    (fs.getFile(pcb.workingdir + command) !== undefined)) {
                 //executable file
                 pcb.set("buffer", "");
                 pcb.pc = pcb.pc + 2;    //goto execute
