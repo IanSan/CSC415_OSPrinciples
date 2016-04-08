@@ -91,6 +91,36 @@ var fs = {
         }
     },
     
+    rmdir: function(path) {
+        //resolve path
+        if (path[0] !== "/") {
+            //only absolute paths
+            return;
+        }
+        path = path.split("/");
+        var currDir = this.root;
+        var i = 1;
+        while (i < path.length - 1) {
+            //if directory does not exist
+            if (!(path[i] in currDir.data) ||
+                    (currDir.data[path[i]].meta[0] !== "d")) {
+                //path resolution failed
+                return;
+            }
+            currDir = currDir.data[path[i]];
+            i++;
+        }
+        if (path[i] in currDir.data && currDir.data[path[i]].meta[0] === "d") {
+            var dir = currDir.data[path[i]].data;
+            for(var file in dir) {
+                if(dir.hasOwnProperty(file))
+                    //directory not empty
+                    return;
+            }
+            delete currDir.data[path[i]];
+        }
+    },
+    
     //returns FileObject at specified path (absolute)
     getFile: function(path) {
         //resolve

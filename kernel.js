@@ -47,6 +47,7 @@ function ioreturn(ioreq) {
         case "remove":
             break;
         case "mkdir":
+        case "rmdir":
             break;
         default:
             console.log("IO Return Error");
@@ -188,6 +189,18 @@ function mkdir(pcb, argv) {
     fq.push_back(ioreq);
     console.log(pcb.toString() + " running to waiting for mkdir");
     pcb.state = "waiting";
+}
+
+//  [rmdir, [_var dirName]]
+// Removes directory (must be empty)
+function rmdir(pcb, argv) {
+    var ioreq = new IORequest("rmdir", pcb);
+    var path = pcb.get(argv[0]);     //_var dirName
+    if (path[0] !== "/") {
+        path = pcb.workingdir + path;
+    }
+    ioreq.data = path;
+    fq.push_back(ioreq);
 }
 
  function set(pcb, argv){

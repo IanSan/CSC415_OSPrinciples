@@ -119,9 +119,13 @@ var io = {
         ioreq.done = true;
         io.ready = true;
     },
-    
     mkdir: function(ioreq) {
         fs.mkdir(ioreq.data);
+        ioreq.done = true;
+        io.ready = true;
+    },
+    rmdir: function(ioreq) {
+        fs.rmdir(ioreq.data);
         ioreq.done = true;
         io.ready = true;
     },
@@ -155,6 +159,9 @@ function iodriver(ioreq) {
             break;
         case "mkdir":
             setTimeout(function(){io.mkdir(ioreq);}, delay);
+            break;
+        case "rmdir":
+            setTimeout(function(){io.rmdir(ioreq);}, delay);
             break;
     }
 }
