@@ -1,11 +1,12 @@
+function FileObject(meta, data) {
+    this.meta = meta;
+    this.data = data;
+}
+
 var fs = {
-    data: {
-        "stdin": "this is from stdin",
-        "stdout": "",
-        "stderr": "",
-        "file1.csv": "abcdef",
-        "file2.csv": "ghijkl"
-    },
+    root: new FileObject("drw-rw-rw-", {
+        "dev": new FileObject("drw-rw-rw-", {}),
+    }),
     
     /**
     *input: name of file 
