@@ -44,6 +44,8 @@ function ioreturn(ioreq) {
             break;
         case "close":
             break;
+        case "remove":
+            break;
         default:
             console.log("IO Return Error");
     }
@@ -82,6 +84,18 @@ function close(pcb, argv){
             break;
         }
     }
+}
+
+//  [remove, [_var filename]]
+// Removes file from filesystem
+function remove(pcb, argv) {
+    var ioreq = new IORequest("remove", pcb);
+    var path = pcb.get(argv[0]);     //_var filename
+    if (path[0] !== "/") {
+        path = pcb.workingdir + path;
+    }
+    ioreq.data = path;
+    fq.push_back(ioreq);
 }
 
 //  [read, [_var filepointer, _var stringBuffer, int size]]

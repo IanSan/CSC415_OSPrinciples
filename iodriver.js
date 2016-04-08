@@ -112,6 +112,12 @@ var io = {
         }
         ioreq.data(filebuff);
         io.ready = true;
+    },
+    
+    remove: function(ioreq) {
+        fs.remove(ioreq.data);
+        ioreq.done = true;
+        io.ready = true;
     }
 };
 
@@ -137,6 +143,9 @@ function iodriver(ioreq) {
             break;
         case "fileList":
             setTimeout(function(){io.fileList(ioreq);}, delay);
+            break;
+        case "remove":
+            setTimeout(function(){io.remove(ioreq);}, delay);
             break;
     }
 }

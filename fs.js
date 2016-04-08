@@ -48,16 +48,11 @@ var fs = {
         var currDir = this.root;
         var i = 1;
         while (i < path.length - 1) {
-            //if name exists
-            if (path[i] in currDir.data) {
-                //check it is a directory
-                if (currDir.data[path[i]].meta[0] !== "d") {
-                    //path resolution failed
-                    return;
-                }
-            } else {
-                //create new directory
-                currDir.data[path[i]] = new FileObject("drw-rw-rw-", {});
+            //if directory does not exist
+            if (!(path[i] in currDir.data) ||
+                    (currDir.data[path[i]].meta[0] !== "d")) {
+                //path resolution failed
+                return;
             }
             currDir = currDir.data[path[i]];
             i++;
