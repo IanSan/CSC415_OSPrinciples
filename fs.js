@@ -74,6 +74,9 @@ var fs = {
             //only absolute paths
             return undefined;
         }
+        if (path === "/") {
+            return this.root;
+        }
         path = path.split("/");
         var currDir = this.root;
         var i = 1;
