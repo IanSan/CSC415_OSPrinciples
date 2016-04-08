@@ -1,8 +1,3 @@
-function FileObject(meta, data) {
-    this.meta = meta;
-    this.data = data;
-}
-
 var fs = {
     root: new FileObject("drw-rw-rw-", {
         "dev": new FileObject("drw-rw-rw-", {}),
