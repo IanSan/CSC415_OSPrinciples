@@ -104,13 +104,20 @@ var io = {
         io.ready = true;
     },
 
-    fileList: function(ioreq){
-        io.ready = false; 
-        var filebuff = new Array();
-        for(var file in fs.data){
-            filebuff+= (file+'\n');
+    list: function(ioreq){
+        var path = ioreq.data;
+        var dir = fs.getFile(path);
+        ioreq.data = new Array();
+        if (dir !== undefined) {
+            if (dir.meta[0] === "d") {
+                for(var file in dir.data){
+                    ioreq.data.push(file);
+                }
+            } else {
+                ioreq.data.push(path);
+            }
         }
-        ioreq.data(filebuff);
+        ioreq.done = true;
         io.ready = true;
     },
     
@@ -151,8 +158,8 @@ function iodriver(ioreq) {
         case "getline":
             setTimeout(function(){io.getline(ioreq);}, delay);
             break;
-        case "fileList":
-            setTimeout(function(){io.fileList(ioreq);}, delay);
+        case "list":
+            setTimeout(function(){io.list(ioreq);}, delay);
             break;
         case "remove":
             setTimeout(function(){io.remove(ioreq);}, delay);

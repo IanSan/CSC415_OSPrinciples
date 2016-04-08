@@ -38,6 +38,7 @@ function ioreturn(ioreq) {
         case "read":
 
         case "getline":
+        case "list":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
             break;
         case "write":
@@ -201,6 +202,20 @@ function rmdir(pcb, argv) {
     }
     ioreq.data = path;
     fq.push_back(ioreq);
+}
+
+//  [readdir, [_var dirName, _var stringArray]
+function readdir(pcb, argv) {
+    var ioreq = new IORequest("list", pcb);
+    var path = pcb.get(argv[0]);     //_var dirName
+    if (path[0] !== "/") {
+        path = pcb.workingdir + path;
+    }
+    ioreq.data = path;
+    ioreq.varId = argv[1];
+    fq.push_back(ioreq);
+    console.log(pcb.toString() + " running to waiting for readdir");
+    pcb.state = "waiting";
 }
 
  function set(pcb, argv){
