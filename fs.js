@@ -37,6 +37,36 @@ var fs = {
         }
     },
     
+    //delete normal files
+    remove: function(path) {
+        //resolve
+        if (path[0] !== "/") {
+            //only absolute paths
+            return;
+        }
+        path = path.split("/");
+        var currDir = this.root;
+        var i = 1;
+        while (i < path.length - 1) {
+            //if name exists
+            if (path[i] in currDir.data) {
+                //check it is a directory
+                if (currDir.data[path[i]].meta[0] !== "d") {
+                    //path resolution failed
+                    return;
+                }
+            } else {
+                //create new directory
+                currDir.data[path[i]] = new FileObject("drw-rw-rw-", {});
+            }
+            currDir = currDir.data[path[i]];
+            i++;
+        }
+        if (path[i] in currDir.data && currDir.data[path[i]].meta[0] === "-") {
+            delete currDir.data[path[i]];
+        }
+    },
+    
     //returns FileObject at specified path (absolute)
     getFile: function(path) {
         //resolve
