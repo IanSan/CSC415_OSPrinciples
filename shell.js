@@ -1,8 +1,8 @@
 var shell = [
-    [set, ["stdin", "dev/input"]],
+    [set, ["stdin", "/dev/input"]],
     [open, ["stdin", "r", "fp"]],
-    [set, ["stdout", "dev/tty0"]],
-    [set, ["stderr", "dev/tty0"]],
+    [set, ["stdout", "/dev/tty0"]],
+    [set, ["stderr", "/dev/tty0"]],
     [open, ["stdout", "r+", "fp2"]],
 //loop
     [set, ["prompt", "user@jsos / $\n"]],
@@ -63,4 +63,4 @@ var shell = [
     }, []]
 ];
 
-fs.data["shell"] = shell;
+fs.put("/shell", shell);

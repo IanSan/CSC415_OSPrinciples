@@ -1,4 +1,4 @@
-fs.data["echo"] = [
+fs.put("/echo", [
     [open, ["stdout", "w", "fp"]],
     [set, ["buffer", ""]],
     [function(pcb, argv) {
@@ -12,4 +12,4 @@ fs.data["echo"] = [
     }, []],
     [write, ["fp", "buffer"]],
     [close, ["fp"]]
-];
+]);
