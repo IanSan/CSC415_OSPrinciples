@@ -59,7 +59,11 @@ function ioreturn(ioreq) {
 // and sets filepointer
 function open(pcb, argv){
     var ioreq = new IORequest("open", pcb);
-    ioreq.data = pcb.get(argv[0]);   //_var filename
+    var path = pcb.get(argv[0]);     //_var filename
+    if (path[0] !== "/") {
+        path = pcb.workingdir + path;
+    }
+    ioreq.data = path;
     ioreq.mode = argv[1];   //string file access mode
     ioreq.varId = argv[2];  //_var identifier to be set with fp
     fq.push_back(ioreq);
