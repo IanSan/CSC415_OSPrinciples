@@ -5,3 +5,5 @@ Assignment 1:
 Current Processes:
 Calculate Vectors,
 Calculate Statistics
+
+*Check the browser console log to view the switching and process states*
