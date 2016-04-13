@@ -1,8 +1,7 @@
 //FileStruct object
-function FileStruct(filepointer, flags) {
-    this.filepointer = filepointer;   //
-    this.flags = flags;				  //permission type: read, write, readwrite
-
+function FileStruct(filepointer, mode) {
+    this.filepointer = filepointer; //FilePointer object
+    this.mode = mode;               //string file access mode
 }
 
 
@@ -12,5 +11,6 @@ function FileStruct(filepointer, flags) {
 function FilePointer(filename, index) {
     this.filename = filename;                       //string filename
     this.index = index === undefined ? 0 : index;   //int
+    this.eof = 0;                                   //int sets to -1 if EOF
 }
 
