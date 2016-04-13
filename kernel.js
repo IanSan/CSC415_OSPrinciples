@@ -44,6 +44,8 @@ function ioreturn(ioreq) {
             break;
         case "close":
             break;
+        case "remove":
+            break;
         default:
             console.log("IO Return Error");
     }
@@ -78,6 +80,14 @@ function close(pcb, argv){
             break;
         }
     }
+}
+
+//  [remove, [_var filename]]
+// Removes file from filesystem
+function remove(pcb, argv) {
+    var ioreq = new IORequest("remove", pcb);
+    ioreq.data = pcb.get(argv[0]);   //_var filename
+    fq.push_back(ioreq);
 }
 
 //  [read, [_var filepointer, _var stringBuffer, int size]]
@@ -170,15 +180,24 @@ function add(pcb, argv){
 // argv[0]. All argument argv are passed to the new process.
 function createChildProcess(pcb, argv) {
     argv = pcb.get(argv);
+    argv[0] = pcb.workingdir + argv[0];
     if(fs.data[argv[0]] === undefined) {
         return;
     }
-    var program = fs.data[argv[0]];
+    var program = fs.data[argv[0]].data;
     var child = pcb.createChild(program, argv[0], "start", programCounter++, argv);
     pq.push_back(child);
     console.log("start " + child.toString());
 }
 
+//  [chdir, [string path]]
+// Changes the current working directory of the calling process to the
+// directory specified in path
+function chdir(pcb, argv) {
+    if (argv[0] in fs.data) {
+        pcb.workingdir = argv[0];
+    }
+}
 
 //=============================================================
 //execute process instruction

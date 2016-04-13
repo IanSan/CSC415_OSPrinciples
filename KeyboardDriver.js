@@ -1,6 +1,6 @@
 //waits for a control character, then writes data into dev/input
 var keyboard = [
-    [set, ["filename", "dev/input"]],
+    [set, ["filename", "/dev/input"]],
     [open, ["filename", "w", "fp"]],   //create device dev/input
     //create textarea thats signal this process
     [function(pcb, argv) {

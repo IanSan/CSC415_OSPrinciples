@@ -47,6 +47,8 @@ function PCB(program, name, state, pid, parent, argv) {
     if (this.parent !== undefined) {
         this.parent.children.push(this);
     }
+    this.workingdir = 
+            this.parent === undefined ? "/" : this.parent.workingdir;
 }
 PCB.prototype.set = function(identifier, value) {
     return this.currVarlist.setValue(identifier, value);

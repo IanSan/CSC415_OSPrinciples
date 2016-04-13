@@ -16,18 +16,18 @@ var io = {
                     delete fs.data[ioreq.data];
                 }
                 //create new empty file
-                fs.data[ioreq.data] = "";
+                fs.data[ioreq.data] = new FileObject("-rw-------", "");
                 ioreq.fp = fs.getFilePointer(ioreq.data);
                 break;
             case "a":
             case "a+":
                 if (ioreq.fp === undefined) {
                     //file does not exist, create new file
-                    fs.data[ioreq.data] = "";
+                    fs.data[ioreq.data] = new FileObject("-rw-------", "");
                 }
                 //set fp to end of file
                 ioreq.fp = fs.getFilePointer(ioreq.data);
-                ioreq.fp.index = fs.data[ioreq.data].length;
+                ioreq.fp.index = fs.data[ioreq.data].data.length;
                 break;
             default:
                 //bad arg
@@ -112,7 +112,23 @@ var io = {
         }
         ioreq.data(filebuff);
         io.ready = true;
-    }
+    },
+    remove: function(ioreq) {
+        var path = ioreq.data;
+        //resolve path
+        if (path[0] !== "/") {
+            if (ioreq.pcb.workingdir === "/") {
+                path = ioreq.pcb.workingdir + path;
+            } else {
+                path = ioreq.pcb.workingdir + "/" + path;
+            }
+        }
+        if (path in fs.data && fs.data[path].meta[0] === "-") {
+            delete fs.data[path];
+        }
+        ioreq.done = true;
+        io.ready = true;
+    },
 };
 
 //setTimeout(function, time-ms) after the time in millisec pass the function will trigger
@@ -137,6 +153,9 @@ function iodriver(ioreq) {
             break;
         case "fileList":
             setTimeout(function(){io.fileList(ioreq);}, delay);
+            break;
+        case "remove":
+            setTimeout(function(){io.remove(ioreq);}, delay);
             break;
     }
 }

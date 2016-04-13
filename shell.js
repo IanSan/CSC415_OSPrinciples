@@ -1,11 +1,14 @@
 var shell = [
-    [set, ["stdin", "dev/input"]],
+    [set, ["stdin", "/dev/input"]],
     [open, ["stdin", "r", "fp"]],
-    [set, ["stdout", "dev/tty0"]],
-    [set, ["stderr", "dev/tty0"]],
+    [set, ["stdout", "/dev/tty0"]],
+    [set, ["stderr", "/dev/tty0"]],
     [open, ["stdout", "r+", "fp2"]],
 //loop
-    [set, ["prompt", "user@jsos / $\n"]],
+    [function(pcb, argv) {
+            var prompt = "user@jsos " + pcb.workingdir + " $\n";
+            pcb.set("prompt", prompt);
+    }],
     [write, ["fp2", "prompt"]],
     [read, ["fp", "buffer", 100]],
     [write, ["fp2", "buffer"]], //echo keystrokes
@@ -21,11 +24,12 @@ var shell = [
     }, []],
     //validate tokens, "argv"[0] should be a valid command
     [function(pcb, argv) {
-            var command = pcb.get("argv")[0];
+            var args = pcb.get("argv");
+            var command = args[0];
             if(command.length === 0) {
                 //empty string
                 pcb.set("buffer", "");
-            } else if(command in fs.data) {
+            } else if((pcb.workingdir + command) in fs.data) {
                 //executable file
                 pcb.set("buffer", "");
                 pcb.pc = pcb.pc + 2;    //goto execute
@@ -33,6 +37,9 @@ var shell = [
                 var str = "";
                 //interpret shell-specific commmands here
                 switch(command) {
+                    case "cd":
+                        chdir(pcb, [args[1]]);
+                        break;
                     case "exit":
                     default:
                         str = command + ": command not found\n";
@@ -63,4 +70,4 @@ var shell = [
     }, []]
 ];
 
-fs.data["shell"] = shell;
+fs.put("/shell", shell);
