@@ -3,7 +3,16 @@ var io = {
     TRANSPORT_LIMIT: 100,   //number of chars a single delivery can handle
     open: function(ioreq) {
         //get fp for given filename
-        ioreq.fp = fs.getFilePointer(ioreq.data);
+        //resolve path
+        var path = ioreq.data;
+        if (path[0] !== "/") {
+            if (ioreq.pcb.workingdir === "/") {
+                path = ioreq.pcb.workingdir + path;
+            } else {
+                path = ioreq.pcb.workingdir + "/" + path;
+            }
+        }
+        ioreq.fp = fs.getFilePointer(path);
         switch(ioreq.mode) {
             case "r":
             case "r+":
