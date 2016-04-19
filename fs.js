@@ -7,6 +7,8 @@ var fs = {
     data: {
         "/": new FileObject("drw-rw-rw-"),
         "/dev": new FileObject("drw-rw-rw-"),
+        "/tempFiles":new FileObject("drw-rw-rw-"),
+        "/tempFiles/file1":new FileObject("-rw-rw-rw-"),
     },
     
     put: function(path, data) {

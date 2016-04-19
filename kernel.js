@@ -36,6 +36,7 @@ function ioreturn(ioreq) {
             ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
+        case "fileList":
 
         case "getline":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
@@ -166,9 +167,19 @@ function getline(pcb, argv) {
     pcb.state = "waiting";
 }
 
- function set(pcb, argv){
+function fileList(pcb,argv){
+    var ioreq = new IORequest("fileList", pcb);
+    ioreq.fp = pcb.workingdir;
+    console.log("kernel: fileList: "+pcb.toString() +" running to waiting for open, ioreq is "+ioreq.fp+". line: " + pcb.pc);
+    ioreq.varId= argv[0];
+    fq.push_back(ioreq);
+    pcb.state = "waiting"; 
+}
+
+function set(pcb, argv){
     pcb.set(argv[0], argv[1]);
 }
+
 function add(pcb, argv){
     pcb.set(argv[0],
             pcb.get[argv[1]] +
