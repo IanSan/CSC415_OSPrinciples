@@ -112,14 +112,23 @@ var io = {
         ioreq.data = ioreq.data + cbuf.join("");
         io.ready = true;
     },
-
-    fileList: function(ioreq){
-        io.ready = false; 
+   fileList: function(ioreq){
         var filebuff = new Array();
-        for(var file in fs.data){
-            filebuff+= (file+'\n');
+        var fileType = 
+            ioreq.pcb.get("workspace") === undefined ? ioreq.fp : ioreq.fp + ioreq.pcb.get("workspace") ;
+        for(var file in fs.data ){
+            console.log("iodriver: fileList--fileType: " + fileType + " "+ fileType.length);
+            var fileCheck = file.substring(0, fileType.length);
+           console.log("iodriver: fileList--fileCheck: "+ fileCheck);
+            if(fileCheck === fileType){
+                filebuff+= ("\n"+file);
+
+            }
+            console.log("iodriver: FileList: Add File to Print: "+file);
         }
-        ioreq.data(filebuff);
+        filebuff+="\n\n";
+        ioreq.data=filebuff;
+        ioreq.done = true;
         io.ready = true;
     },
     remove: function(ioreq) {

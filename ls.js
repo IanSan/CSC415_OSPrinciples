@@ -1,11 +1,18 @@
-ls.js
-
-//list the processes running
-var ls = function (pcb, argv){
-	var ioreq = new IORequest("fileList", pcb);
- 	ioreq.fp = pcb.get(argv[0]);            //_var filepointer
- 	ioreq.data = pcb.get(argv[1]);          //_var stringBuffer
-    ioreq.size = pcb.get(argv[1]).length;   //int size
-    fq.push_back(ioreq);
-	pcb.state = "waiting"; 
-}
+fs.put(	"/ls", 
+	[    
+	    [open, ["stdout", "w", "fp"]],
+	    [set, ["files", ""]],
+	    [set, ["workspace", ""]],
+	    [function(pcb, argv) {
+	            var args = pcb.get("argv");
+	            args.shift();   //shifts out "echo"
+	            args = args.join("");
+	            if (args.length > 0) {
+	                pcb.set("workspace", args);
+	            }
+    }, []],
+	 	[fileList, ["files"]],
+	    [write, ["fp", "files"]],
+	    [close, ["fp"]]
+	]
+);
