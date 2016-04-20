@@ -5,7 +5,10 @@ var shell = [
     [set, ["stderr", "/dev/tty0"]],
     [open, ["stdout", "r+", "fp2"]],
 //loop
-    [set, ["prompt", "user@jsos / $\n"]],
+    [function(pcb, argv) {
+            var prompt = "user@jsos " + pcb.workingdir + " $\n";
+            pcb.set("prompt", prompt);
+    }],
     [write, ["fp2", "prompt"]],
     [read, ["fp", "buffer", 100]],
     [write, ["fp2", "buffer"]], //echo keystrokes
@@ -34,6 +37,10 @@ var shell = [
                 var str = "";
                 //interpret shell-specific commmands here
                 switch(command) {
+                    case "cd":
+                        pcb.set("workingdir", pcb.get("argv")[1]);
+                        chdir(pcb, ["workingdir"]);
+                        break;
                     case "exit":
                     default:
                         str = command + ": command not found\n";
