@@ -218,6 +218,23 @@ function readdir(pcb, argv) {
     pcb.state = "waiting";
 }
 
+//  [chdir, [_var path]]
+// Changes the current working directory of the calling process to the
+// directory specified in path
+function chdir(pcb, argv) {
+    var path = pcb.get(argv[0]);     //_var dirName
+    if (path[0] !== "/") {
+        path = pcb.workingdir + path;
+    }
+    var dir = fs.getFile(path);
+    if (dir !== undefined) {
+        if (path[path.length-1] !== "/") {
+            path = path + "/";
+        }
+        pcb.workingdir = path;
+    }
+}
+
  function set(pcb, argv){
     pcb.set(argv[0], argv[1]);
 }
