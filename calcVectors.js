@@ -5,7 +5,7 @@
 
 //20 vectors (all (1,2))
 //sum of the vectors should be (20,40)
-fs.data["vector_data.csv"] = "\
+fs.put("/vector_data.csv", "\
 1,2\n\
 1,2\n\
 1,2\n\
@@ -27,10 +27,12 @@ fs.data["vector_data.csv"] = "\
 1,2\n\
 1,2\
 "
+);
 
-var calcVectors =
+fs.put("/calcVectors",
 [
-    [open, ["vector_data.csv", "r", "fp"]],
+    [set, ["filename", "/vector_data.csv"]],
+    [open, ["filename", "r", "fp"]],
     [read, ["fp", "buffer", 1000]],
     [close, ["fp"]],
     [function(pcb, argv) {
@@ -44,7 +46,8 @@ var calcVectors =
         var str = x.toString() + "," + y.toString();
         pcb.set("buffer", str);
     }, []],
-    [open, ["vector_data.csv", "w", "fp2"]],
+    [open, ["filename", "w", "fp2"]],
     [write, ["fp2", "buffer"]],
     [close, ["fp2"]]
-];
+]
+);
