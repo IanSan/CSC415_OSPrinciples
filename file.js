@@ -18,3 +18,30 @@ function FilePointer(fileObject, index) {
     this.eof = 0;                                   //int sets to -1 if EOF
 }
 
+function resolvePath(path, startingDirectory) {
+    var resolvedPath = path;
+    if (path[0] !== "/") {
+        //resolve relative path to absolute
+        //add trailing slash
+        if (startingDirectory[startingDirectory.length - 1] !== "/") {
+            startingDirectory = startingDirectory + "/";
+        }
+        resolvedPath = startingDirectory + path;
+    }
+    //add trailing slash for pattern
+    if (resolvedPath[resolvedPath.length - 1] !== "/") {
+        resolvedPath = resolvedPath + "/";
+    }
+    
+    //resolve . and ..
+    //replace /./ with /
+    resolvedPath = resolvedPath.replace(/\/\.\//g, "/");
+    //replace /dir/../ with /
+    resolvedPath = resolvedPath.replace(/\/[A-Za-z0-9]+\/\.\.\//g, "/");
+    
+    //remove trailing slash (unless this is root /)
+    if (resolvedPath[resolvedPath.length - 1] === "/" && resolvedPath !== "/") {
+        resolvedPath = resolvedPath.substr(0, resolvedPath.length - 1);
+    }
+    return resolvedPath;
+}
