@@ -5,7 +5,7 @@
  // individual 27-29
  // group 30-32
  // exam 33
-fs.data["stats.csv"] = "\
+fs.put("/stats.csv", "\
 20,20,20,20,20,20,20,\
 20,20,20,20,20,20,20,\
 20,20,20,20,20,20,\
@@ -14,7 +14,7 @@ fs.data["stats.csv"] = "\
 20,20,20,\
 280\
 "
-fs.data["stats_result.csv"] =""
+);
 
 function calcGrade(pcb,argv) {
 	var arr = pcb.get("buffer").split(",");
@@ -61,14 +61,16 @@ function calcGrade(pcb,argv) {
 	console.log("Your final grade is " + finalGrade);
 };
 
-var classGrade =
+fs.put("/classGrade",
 [
-	[open, ["stats.csv", "r", "fp"]],
+	[set, ["filename", "/stats.csv"]],
+	[open, ["filename", "r", "fp"]],
 	[read, ["fp", "buffer", 10000]],
 	[close, ["fp"]],
 	[calcGrade, []],
-	[open, ["stats_result.csv", "w", "fp2"]],
+	[set, ["resultFile", "/stats_result.csv"]],
+	[open, ["resultFile", "w", "fp2"]],
 	[write, ["fp2","buffer"]],
 	[close, ["fp2"]]
-];
-	
+]
+);
