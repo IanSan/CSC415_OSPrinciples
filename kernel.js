@@ -66,10 +66,7 @@ function ioreturn(ioreq) {
 function open(pcb, argv){
     var ioreq = new IORequest("open", pcb);
     var path = pcb.get(argv[0]);     //_var filename
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
-    ioreq.data = path;
+    ioreq.data = resolvePath(path, pcb.workingdir);
     ioreq.mode = argv[1];   //string file access mode
     ioreq.varId = argv[2];  //_var identifier to be set with fp
     fq.push_back(ioreq);
@@ -95,10 +92,7 @@ function close(pcb, argv){
 function remove(pcb, argv) {
     var ioreq = new IORequest("remove", pcb);
     var path = pcb.get(argv[0]);     //_var filename
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
-    ioreq.data = path;
+    ioreq.data = resolve(path, pcb.workingdir);
     fq.push_back(ioreq);
 }
 
@@ -183,10 +177,7 @@ function getline(pcb, argv) {
 function mkdir(pcb, argv) {
     var ioreq = new IORequest("mkdir", pcb);
     var path = pcb.get(argv[0]);     //_var dirName
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
-    ioreq.data = path;
+    ioreq.data = resolvePath(path, pcb.workingdir);
     fq.push_back(ioreq);
     console.log(pcb.toString() + " running to waiting for mkdir");
     pcb.state = "waiting";
@@ -197,10 +188,7 @@ function mkdir(pcb, argv) {
 function rmdir(pcb, argv) {
     var ioreq = new IORequest("rmdir", pcb);
     var path = pcb.get(argv[0]);     //_var dirName
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
-    ioreq.data = path;
+    ioreq.data = resolvePath(path, pcb.workingdir);
     fq.push_back(ioreq);
 }
 
@@ -208,10 +196,7 @@ function rmdir(pcb, argv) {
 function readdir(pcb, argv) {
     var ioreq = new IORequest("list", pcb);
     var path = pcb.get(argv[0]);     //_var dirName
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
-    ioreq.data = path;
+    ioreq.data = resolvePath(path, pcb.workingdir);
     ioreq.varId = argv[1];
     fq.push_back(ioreq);
     console.log(pcb.toString() + " running to waiting for readdir");
@@ -223,9 +208,7 @@ function readdir(pcb, argv) {
 // directory specified in path
 function chdir(pcb, argv) {
     var path = pcb.get(argv[0]);     //_var dirName
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
+    path = resolvePath(path, pcb.workingdir);
     var dir = fs.getFile(path);
     if (dir !== undefined) {
         if (path[path.length-1] !== "/") {
@@ -250,9 +233,7 @@ function add(pcb, argv){
 function createChildProcess(pcb, argv) {
     argv = pcb.get(argv);
     var path = argv[0];
-    if (path[0] !== "/") {
-        path = pcb.workingdir + path;
-    }
+    path = resolvePath(path, pcb.workingdir);
     var program = fs.getFile(path);
     if (program === undefined) {
         return;
