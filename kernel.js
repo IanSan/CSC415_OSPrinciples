@@ -210,10 +210,7 @@ function chdir(pcb, argv) {
     var path = pcb.get(argv[0]);     //_var dirName
     path = resolvePath(path, pcb.workingdir);
     var dir = fs.getFile(path);
-    if (dir !== undefined) {
-        if (path[path.length-1] !== "/") {
-            path = path + "/";
-        }
+    if (dir !== undefined && dir.meta[0] === "d") {
         pcb.workingdir = path;
     }
 }
