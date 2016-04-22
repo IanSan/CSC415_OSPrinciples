@@ -15,4 +15,4 @@ Basic Directory Operations:
 - kill: kills a process by its pid
 - cat: reads files and writes it to screen
 
-The usage of processes is similar to Linux, e.g. cp <fileName1> <fileName2> and echo <message>
+The usage of processes is similar to Linux, e.g. cp \<fileName1> \<fileName2> and echo \<message>
