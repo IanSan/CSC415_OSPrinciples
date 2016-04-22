@@ -1,4 +1,4 @@
-fs.put("/ls", [
+fs.put("/bin/ls", [
     [open, ["stdout", "w", "fp"]],
     [function(pcb, argv) {
             var args = pcb.get("argv");

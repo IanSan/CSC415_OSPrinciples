@@ -1,4 +1,4 @@
-fs.put("/echo", [
+fs.put("/bin/echo", [
     [open, ["stdout", "w", "fp"]],
     [set, ["buffer", ""]],
     [function(pcb, argv) {

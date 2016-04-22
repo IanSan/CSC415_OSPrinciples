@@ -1,4 +1,4 @@
-fs.put("/mkdir", [[function(pcb, argv) {
+fs.put("/bin/mkdir", [[function(pcb, argv) {
         var newdir = pcb.get("argv")[1];
         if (newdir.length > 0) {
             pcb.set("name", newdir);

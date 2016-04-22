@@ -9,7 +9,7 @@ function searchPathExists(filename, pathSearch) {
     return undefined;
 }
 
-fs.put("/shell", [
+fs.put("/bin/shell", [
     [set, ["stdin", "/dev/input"]],
     [open, ["stdin", "r", "fp"]],
     [set, ["stdout", "/dev/tty0"]],
