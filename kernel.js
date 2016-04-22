@@ -6,9 +6,9 @@ var fq = new Queue();
 
 //create new process
 var programCounter = 0;
-function load(program) {
-    pq.push_back(new PCB(program, "start", programCounter, undefined));
-    console.log("start process"+ programCounter);
+function load(program, name) {
+    pq.push_back(new PCB(program, name, "start", programCounter, undefined));
+    console.log("start " + programCounter + " " + name);
     console.log(pq.tail.object.program);
     programCounter++;
 };
@@ -36,12 +36,16 @@ function ioreturn(ioreq) {
             ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
+        case "fileList":
+
         case "getline":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
             break;
         case "write":
             break;
         case "close":
+            break;
+        case "remove":
             break;
         default:
             console.log("IO Return Error");
@@ -53,15 +57,16 @@ function ioreturn(ioreq) {
 // some definitions for our own sanity
 // _var : a string in user programs, but interpreted as a variable identifier
 
-//  [open, [string filename, string flags, _var filepointer]]
-// Opens a file called filename with given permission flags and sets filepointer
+//  [open, [_var filename, string flags, _var filepointer]]
+// Opens a file with the name set in _var filename with given permission flags
+// and sets filepointer
 function open(pcb, argv){
     var ioreq = new IORequest("open", pcb);
-    ioreq.data = argv[0];   //string filename
+    ioreq.data = pcb.get(argv[0]);   //_var filename
     ioreq.mode = argv[1];   //string file access mode
     ioreq.varId = argv[2];  //_var identifier to be set with fp
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for open");
+    console.log(pcb.toString() + " running to waiting for open");
     pcb.state = "waiting";
 }
 
@@ -76,7 +81,14 @@ function close(pcb, argv){
             break;
         }
     }
-    console.log("process state running for close");
+}
+
+//  [remove, [_var filename]]
+// Removes file from filesystem
+function remove(pcb, argv) {
+    var ioreq = new IORequest("remove", pcb);
+    ioreq.data = pcb.get(argv[0]);   //_var filename
+    fq.push_back(ioreq);
 }
 
 //  [read, [_var filepointer, _var stringBuffer, int size]]
@@ -100,7 +112,7 @@ function read(pcb, argv){
     ioreq.varId = argv[1];          //_var identifier to be set with string
     ioreq.size = argv[2];           //int size
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for read");
+    console.log(pcb.toString() + " running to waiting for read");
     pcb.state = "waiting";
 }
 
@@ -126,7 +138,7 @@ function write(pcb, argv){
     ioreq.data = pcb.get(argv[1]);          //_var stringBuffer
     ioreq.size = pcb.get(argv[1]).length;   //int size
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for write");
+    console.log(pcb.toString() + " running to waiting for write");
     pcb.state = "waiting";
 }
 
@@ -151,33 +163,57 @@ function getline(pcb, argv) {
     ioreq.size = argv[1];           //int size
     ioreq.fp = pcb.get(argv[2]);    //_var filepointer
     fq.push_back(ioreq);
-    console.log("process change state running to waiting for getline");
+    console.log(pcb.toString() + " running to waiting for getline");
     pcb.state = "waiting";
 }
 
- function set(pcb, argv){
+function fileList(pcb,argv){
+    var ioreq = new IORequest("fileList", pcb);
+    ioreq.fp = pcb.workingdir;
+    console.log("kernel: fileList: "+pcb.toString() +" running to waiting for open, ioreq is "+ioreq.fp+". line: " + pcb.pc);
+    ioreq.varId= argv[0];
+    fq.push_back(ioreq);
+    pcb.state = "waiting"; 
+}
+
+function set(pcb, argv){
     pcb.set(argv[0], argv[1]);
 }
+
 function add(pcb, argv){
     pcb.set(argv[0],
             pcb.get[argv[1]] +
             pcb.get[argv[2]]);
 }
 
+//  [createChildProcess, [_var argv]]
+// Creates child process, executing the program with filename given in _var
+// argv[0]. All argument argv are passed to the new process.
+function createChildProcess(pcb, argv) {
+    argv = pcb.get(argv);
+    argv[0] = pcb.workingdir + argv[0];
+    if(fs.data[argv[0]] === undefined) {
+        return;
+    }
+    var program = fs.data[argv[0]].data;
+    var child = pcb.createChild(program, argv[0], "start", programCounter++, argv);
+    pq.push_back(child);
+    console.log("start " + child.toString());
+}
 
+//  [chdir, [string path]]
+// Changes the current working directory of the calling process to the
+// directory specified in path
+function chdir(pcb, argv) {
+    if (argv[0] in fs.data) {
+        pcb.workingdir = argv[0];
+    }
+}
 
 //=============================================================
-
 //execute process instruction
-/** structure of process code should be the following: 
-* open-theCMD, desiredFile, fileFlag, addressOfLocation
-* read-theCMD, addressofLocation, null, desiredDestination
-* write 
-* close 
-* add
-*/
 function exec(pcb) {
-    console.log("process change state "+pcb.state+" to running for exec");
+    console.log(pcb.toString() + " "+pcb.state+" to running");
     pcb.state = "running";
     while(pcb.state === "running") {
         var line = pcb.program[pcb.pc];
@@ -187,52 +223,38 @@ function exec(pcb) {
         pcb.pc = pcb.pc + 1; 
         //end of process file then will delete
         if(pcb.pc >= pcb.program.length) {
-            console.log("process change state running to stop");
-            pcb.state = "stop";
+            console.log(pcb.toString() + "stopping");
+            pcb.stop();
         }
     }
 };
 
-
+//main kernel loop
 function kernel() {
-    //main kernel loop
-    //while(!pq.isEmpty()) {
-        //execute instructions of ready process
-        if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
-            exec(pq.front());
-        }
-        
-        //move process to end of queue
-        if(!pq.isEmpty() && pq.front().state === "stop") {
-            console.log("finished "+ pq.front().pid );
-            pq.pop_front();
-        } else {
-            pq.push_back(pq.pop_front());
-        }
-        
-        //unload finished processes
-        while(!pq.isEmpty() && pq.front().state === "stop") {
-            console.log("finished "+ pq.front().pid );
-            pq.pop_front();
-        }
-        
-        //run io driver
-        while(io.ready && !fq.isEmpty() && !fq.front().done) {
-            iodriver(fq.front());
-        }
-
-        //return finished io requests
-        while(!fq.isEmpty() && fq.front().done) {
-            //return data to requesting process & remove io request
-            ioreturn(fq.pop_front());
-        }
-        //because javascript is single-threaded
-        //stop this line of execution and then restart it
-        //calling kernel() emulates while(!pq.isEmpty()) {...}
-        if(pq.isEmpty()) {
-            console.log("all processes stopped, kernel stopped");
-        } else {
-            setTimeout(function(){kernel();}, 0);
-        }
-    //}
+    //execute instructions of ready process
+    if(!pq.isEmpty() && pq.front().state === "ready" || pq.front().state === "start") {
+        exec(pq.front());
+    }
+    //move process to end of queue
+    if(!pq.isEmpty() && pq.front().state === "stop") {
+        console.log("finished "+ pq.front().pid );
+        pq.pop_front();
+    } else {
+        pq.push_back(pq.pop_front());
+    }
+    //unload finished processes
+    while(!pq.isEmpty() && pq.front().state === "stop") {
+        console.log("finished "+ pq.front().pid );
+        pq.pop_front();
+    }
+    //run io driver
+    while(io.ready && !fq.isEmpty() && !fq.front().done) {
+        iodriver(fq.front());
+    }
+    //return finished io requests
+    while(!fq.isEmpty() && fq.front().done) {
+        //return data to requesting process & remove io request
+        ioreturn(fq.pop_front());
+    }
+    setTimeout(function(){kernel();}, 0);
 };

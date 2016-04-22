@@ -1,7 +1,8 @@
 function init() {
     //load all processes
-    load(calcVectors);
-    load(classGrade);
+    load(display, "display");
+    load(keyboard, "keyboard");
+    load(shell, "shell");
 
     //start kernel
     console.log("kernel starting");

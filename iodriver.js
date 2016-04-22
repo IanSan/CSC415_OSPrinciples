@@ -3,7 +3,16 @@ var io = {
     TRANSPORT_LIMIT: 100,   //number of chars a single delivery can handle
     open: function(ioreq) {
         //get fp for given filename
-        ioreq.fp = fs.getFilePointer(ioreq.data);
+        //resolve path
+        var path = ioreq.data;
+        if (path[0] !== "/") {
+            if (ioreq.pcb.workingdir === "/") {
+                path = ioreq.pcb.workingdir + path;
+            } else {
+                path = ioreq.pcb.workingdir + "/" + path;
+            }
+        }
+        ioreq.fp = fs.getFilePointer(path);
         switch(ioreq.mode) {
             case "r":
             case "r+":
@@ -16,18 +25,18 @@ var io = {
                     delete fs.data[ioreq.data];
                 }
                 //create new empty file
-                fs.data[ioreq.data] = "";
+                fs.data[ioreq.data] = new FileObject("-rw-------", "");
                 ioreq.fp = fs.getFilePointer(ioreq.data);
                 break;
             case "a":
             case "a+":
                 if (ioreq.fp === undefined) {
                     //file does not exist, create new file
-                    fs.data[ioreq.data] = "";
+                    fs.data[ioreq.data] = new FileObject("-rw-------", "");
                 }
                 //set fp to end of file
                 ioreq.fp = fs.getFilePointer(ioreq.data);
-                ioreq.fp.index = fs.data[ioreq.data].length;
+                ioreq.fp.index = fs.data[ioreq.data].data.length;
                 break;
             default:
                 //bad arg
@@ -39,8 +48,8 @@ var io = {
     read: function(ioreq) {
         var cbuf = new Array();
         var i;
-        if (ioreq.size > TRANSPORT_LIMIT) {
-            for (i = 0; i < TRANSPORT_LIMIT; i++) {
+        if (ioreq.size > io.TRANSPORT_LIMIT) {
+            for (i = 0; i < io.TRANSPORT_LIMIT; i++) {
                 cbuf[i] = fs.getFileData(ioreq.fp);
                 ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
                 if(ioreq.fp.eof) {
@@ -66,8 +75,8 @@ var io = {
     }, 
     write: function(ioreq) {
         var i;
-        if (ioreq.size > TRANSPORT_LIMIT) {
-            for (i = 0; i < TRANSPORT_LIMIT; i++) {
+        if (ioreq.size > io.TRANSPORT_LIMIT) {
+            for (i = 0; i < io.TRANSPORT_LIMIT; i++) {
                 fs.setFileData(ioreq.fp, ioreq.data[i]);
                 ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
             }
@@ -85,7 +94,7 @@ var io = {
     getline: function(ioreq) {
         var cbuf = new Array();
         var i;
-        for (i = 0; i < TRANSPORT_LIMIT; i++) {
+        for (i = 0; i < io.TRANSPORT_LIMIT; i++) {
             cbuf[i] = fs.getFileData(ioreq.fp);
             ioreq.fp.index = ioreq.fp.index + 1;    //incr fp
             if(i === ioreq.size - 1||
@@ -95,20 +104,55 @@ var io = {
                 break;
             }
         }
-        if (i === TRANSPORT_LIMIT && ioreq.done === false) {
+        if (i === io.TRANSPORT_LIMIT && ioreq.done === false) {
             ioreq.size = ioreq.size - i;    //read is not finished
         }
         //append received data into the IORequest
         if(ioreq.data === undefined) ioreq.data = "";
         ioreq.data = ioreq.data + cbuf.join("");
         io.ready = true;
-    }
+    },
+   fileList: function(ioreq){
+        var filebuff = new Array();
+        var fileType = 
+            ioreq.pcb.get("workspace") === undefined ? ioreq.fp : ioreq.fp + ioreq.pcb.get("workspace") ;
+        for(var file in fs.data ){
+            console.log("iodriver: fileList--fileType: " + fileType + " "+ fileType.length);
+            var fileCheck = file.substring(0, fileType.length);
+           console.log("iodriver: fileList--fileCheck: "+ fileCheck);
+            if(fileCheck === fileType){
+                filebuff+= ("\n"+file);
+
+            }
+            console.log("iodriver: FileList: Add File to Print: "+file);
+        }
+        filebuff+="\n\n";
+        ioreq.data=filebuff;
+        ioreq.done = true;
+        io.ready = true;
+    },
+    remove: function(ioreq) {
+        var path = ioreq.data;
+        //resolve path
+        if (path[0] !== "/") {
+            if (ioreq.pcb.workingdir === "/") {
+                path = ioreq.pcb.workingdir + path;
+            } else {
+                path = ioreq.pcb.workingdir + "/" + path;
+            }
+        }
+        if (path in fs.data && fs.data[path].meta[0] === "-") {
+            delete fs.data[path];
+        }
+        ioreq.done = true;
+        io.ready = true;
+    },
 };
 
 //setTimeout(function, time-ms) after the time in millisec pass the function will trigger
 function iodriver(ioreq) {
     io.ready = false;
-    var delay = Math.random()*1000;
+    var delay = Math.random()*10;
     switch(ioreq.task) {
         case "open":
             setTimeout(function(){io.open(ioreq);}, delay);
@@ -124,6 +168,12 @@ function iodriver(ioreq) {
             break;
         case "getline":
             setTimeout(function(){io.getline(ioreq);}, delay);
+            break;
+        case "fileList":
+            setTimeout(function(){io.fileList(ioreq);}, delay);
+            break;
+        case "remove":
+            setTimeout(function(){io.remove(ioreq);}, delay);
             break;
     }
 }

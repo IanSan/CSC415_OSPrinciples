@@ -43,3 +43,15 @@ Queue.prototype.push_back = function(object) {
     }
     this.length++;
 };
+
+Queue.prototype.iterate = function(){
+    var proc_list = [], currNode;
+    proc_list[0] = this.head.object;
+	 currNode = this.head;
+    var i;
+    for(i=1; i<this.length; i++) {
+		  currNode = currNode.next;
+        proc_list[i] = currNode.object;
+    }
+    return proc_list;
+};
