@@ -1,5 +1,5 @@
 //waits for a control character, then writes data into dev/input
-var keyboard = [
+fs.put("/bin/keyboard", [
     [set, ["filename", "/dev/input"]],
     //create character device dev/input
     [function(pcb, argv) {
@@ -37,4 +37,4 @@ var keyboard = [
             pcb.pc = 3; //next instr 4
             pcb.state = "waiting";
     }, []]
-];
+]);

@@ -1,5 +1,5 @@
 //occasionally flushes tty0 and prints to display (html)
-var display = [
+fs.put("/bin/display", [
     [set, ["filename", "/dev/tty0"]],
     //create character device dev/tty0
     [function(pcb, argv) {
@@ -20,4 +20,4 @@ var display = [
     [function(pcb, argv) {
             pcb.pc = 2; //next instr 3
     }, []]
-];
+]);
