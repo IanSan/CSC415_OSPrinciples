@@ -239,7 +239,12 @@ function createChildProcess(pcb, argv) {
         return;
     }
     
-    var child = pcb.createChild(program.data, argv[0], "start", programCounter++, argv);
+    var child = pcb.createChild(
+            program.data,
+            argv[0].split("/").pop(),
+            "start",
+            programCounter++,
+            argv);
     pq.push_back(child);
     console.log("start " + child.toString());
 }
