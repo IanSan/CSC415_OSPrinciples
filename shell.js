@@ -1,9 +1,21 @@
-var shell = [
+function searchPathExists(filename, pathSearch) {
+    pathSearch = pathSearch.split(":");
+    for (var i = 0; i < pathSearch.length; i++) {
+        if (fs.getFile(resolvePath(filename, pathSearch[i])) !== undefined) {
+            //file exists
+            return resolvePath(filename, pathSearch[i]);
+        }
+    }
+    return undefined;
+}
+
+fs.put("/bin/shell", [
     [set, ["stdin", "/dev/input"]],
     [open, ["stdin", "r", "fp"]],
     [set, ["stdout", "/dev/tty0"]],
     [set, ["stderr", "/dev/tty0"]],
     [open, ["stdout", "r+", "fp2"]],
+    [set, ["path", "/bin"]],
 //loop
     [function(pcb, argv) {
             var prompt = "user@jsos " + pcb.workingdir + " $\n";
@@ -16,7 +28,7 @@ var shell = [
     //parse input, split tokens by whitespace and store in "argv"
     [function(pcb, argv) {
             if(pcb.get("buffer").length === 0) {
-                pcb.pc = 6; //next instr 7
+                pcb.pc = 7; //next instr 8
                 return;
             }
             var args = pcb.get("buffer").split(/[ \n]+/);
@@ -29,8 +41,10 @@ var shell = [
             if(command.length === 0) {
                 //empty string
                 pcb.set("buffer", "");
-            } else if((pcb.workingdir + command) in fs.data) {
+            } else if ((args[0] = searchPathExists(command,
+                    pcb.get("path") + ":" + pcb.workingdir)) !== undefined) {
                 //executable file
+                pcb.set("argv", args);
                 pcb.set("buffer", "");
                 pcb.pc = pcb.pc + 2;    //goto execute
             } else {
@@ -38,7 +52,8 @@ var shell = [
                 //interpret shell-specific commmands here
                 switch(command) {
                     case "cd":
-                        chdir(pcb, [args[1]]);
+                        pcb.set("workingdir", pcb.get("argv")[1]);
+                        chdir(pcb, ["workingdir"]);
                         break;
                     case "exit":
                     default:
@@ -51,7 +66,7 @@ var shell = [
     [write, ["fp2", "buffer"]],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 4; //next instr 5
+            pcb.pc = 5; //next instr 6
     }, []],
 //execute
     //find file in filesystem and execute, pass arguments
@@ -66,8 +81,6 @@ var shell = [
     }, []],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 4; //next instr 5
+            pcb.pc = 5; //next instr 6
     }, []]
-];
-
-fs.put("/shell", shell);
+]);

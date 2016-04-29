@@ -36,9 +36,8 @@ function ioreturn(ioreq) {
             ioreq.pcb.fileList.push(new FileStruct(ioreq.fp, ioreq.mode));
             break;
         case "read":
-        case "fileList":
-
         case "getline":
+        case "list":
             ioreq.pcb.set(ioreq.varId, ioreq.data);
             break;
         case "write":
@@ -46,6 +45,9 @@ function ioreturn(ioreq) {
         case "close":
             break;
         case "remove":
+            break;
+        case "mkdir":
+        case "rmdir":
             break;
         default:
             console.log("IO Return Error");
@@ -62,7 +64,8 @@ function ioreturn(ioreq) {
 // and sets filepointer
 function open(pcb, argv){
     var ioreq = new IORequest("open", pcb);
-    ioreq.data = pcb.get(argv[0]);   //_var filename
+    var path = pcb.get(argv[0]);     //_var filename
+    ioreq.data = resolvePath(path, pcb.workingdir);
     ioreq.mode = argv[1];   //string file access mode
     ioreq.varId = argv[2];  //_var identifier to be set with fp
     fq.push_back(ioreq);
@@ -87,7 +90,8 @@ function close(pcb, argv){
 // Removes file from filesystem
 function remove(pcb, argv) {
     var ioreq = new IORequest("remove", pcb);
-    ioreq.data = pcb.get(argv[0]);   //_var filename
+    var path = pcb.get(argv[0]);     //_var filename
+    ioreq.data = resolve(path, pcb.workingdir);
     fq.push_back(ioreq);
 }
 
@@ -167,13 +171,47 @@ function getline(pcb, argv) {
     pcb.state = "waiting";
 }
 
-function fileList(pcb,argv){
-    var ioreq = new IORequest("fileList", pcb);
-    ioreq.fp = pcb.workingdir;
-    console.log("kernel: fileList: "+pcb.toString() +" running to waiting for open, ioreq is "+ioreq.fp+". line: " + pcb.pc);
-    ioreq.varId= argv[0];
+//  [mkdir, [_var dirName]]
+// Makes a new directory
+function mkdir(pcb, argv) {
+    var ioreq = new IORequest("mkdir", pcb);
+    var path = pcb.get(argv[0]);     //_var dirName
+    ioreq.data = resolvePath(path, pcb.workingdir);
     fq.push_back(ioreq);
-    pcb.state = "waiting"; 
+    console.log(pcb.toString() + " running to waiting for mkdir");
+    pcb.state = "waiting";
+}
+
+//  [rmdir, [_var dirName]]
+// Removes directory (must be empty)
+function rmdir(pcb, argv) {
+    var ioreq = new IORequest("rmdir", pcb);
+    var path = pcb.get(argv[0]);     //_var dirName
+    ioreq.data = resolvePath(path, pcb.workingdir);
+    fq.push_back(ioreq);
+}
+
+//  [readdir, [_var dirName, _var stringArray]
+function readdir(pcb, argv) {
+    var ioreq = new IORequest("list", pcb);
+    var path = pcb.get(argv[0]);     //_var dirName
+    ioreq.data = resolvePath(path, pcb.workingdir);
+    ioreq.varId = argv[1];
+    fq.push_back(ioreq);
+    console.log(pcb.toString() + " running to waiting for readdir");
+    pcb.state = "waiting";
+}
+
+//  [chdir, [_var path]]
+// Changes the current working directory of the calling process to the
+// directory specified in path
+function chdir(pcb, argv) {
+    var path = pcb.get(argv[0]);     //_var dirName
+    path = resolvePath(path, pcb.workingdir);
+    var dir = fs.getFile(path);
+    if (dir !== undefined && dir.meta[0] === "d") {
+        pcb.workingdir = path;
+    }
 }
 
 function set(pcb, argv){
@@ -191,23 +229,21 @@ function add(pcb, argv){
 // argv[0]. All argument argv are passed to the new process.
 function createChildProcess(pcb, argv) {
     argv = pcb.get(argv);
-    argv[0] = pcb.workingdir + argv[0];
-    if(fs.data[argv[0]] === undefined) {
+    var path = argv[0];
+    path = resolvePath(path, pcb.workingdir);
+    var program = fs.getFile(path);
+    if (program === undefined) {
         return;
     }
-    var program = fs.data[argv[0]].data;
-    var child = pcb.createChild(program, argv[0], "start", programCounter++, argv);
+    
+    var child = pcb.createChild(
+            program.data,
+            argv[0].split("/").pop(),
+            "start",
+            programCounter++,
+            argv);
     pq.push_back(child);
     console.log("start " + child.toString());
-}
-
-//  [chdir, [string path]]
-// Changes the current working directory of the calling process to the
-// directory specified in path
-function chdir(pcb, argv) {
-    if (argv[0] in fs.data) {
-        pcb.workingdir = argv[0];
-    }
 }
 
 //=============================================================

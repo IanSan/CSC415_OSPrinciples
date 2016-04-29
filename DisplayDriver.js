@@ -1,8 +1,10 @@
 //occasionally flushes tty0 and prints to display (html)
-var display = [
+fs.put("/bin/display", [
     [set, ["filename", "/dev/tty0"]],
-    [open, ["filename", "w", "fp"]],   //create device dev/ttyS0
-    [close, ["fp"]],
+    //create character device dev/tty0
+    [function(pcb, argv) {
+            fs.put("/dev/tty0", "", "crw-rw-rw-");
+    }, []],
     [open, ["filename", "r", "fp"]],
 //loop:
     [read, ["fp", "buffer", 100]],
@@ -16,6 +18,6 @@ var display = [
     }, []],
 //goto loop
     [function(pcb, argv) {
-            pcb.pc = 3; //next instr 4
+            pcb.pc = 2; //next instr 3
     }, []]
-];
+]);

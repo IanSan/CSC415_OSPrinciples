@@ -22,21 +22,21 @@ var io = {
             case "w+":
                 if (ioreq.fp !== undefined) {
                     //file exists, delete it
-                    delete fs.data[ioreq.data];
+                    fs.remove(ioreq.data);
                 }
                 //create new empty file
-                fs.data[ioreq.data] = new FileObject("-rw-------", "");
+                fs.put(ioreq.data, "");
                 ioreq.fp = fs.getFilePointer(ioreq.data);
                 break;
             case "a":
             case "a+":
                 if (ioreq.fp === undefined) {
                     //file does not exist, create new file
-                    fs.data[ioreq.data] = new FileObject("-rw-------", "");
+                    fs.put(ioreq.data, "");
                 }
                 //set fp to end of file
                 ioreq.fp = fs.getFilePointer(ioreq.data);
-                ioreq.fp.index = fs.data[ioreq.data].data.length;
+                ioreq.fp.index = ioreq.fp.fileObject.data.length;
                 break;
             default:
                 //bad arg
@@ -112,38 +112,35 @@ var io = {
         ioreq.data = ioreq.data + cbuf.join("");
         io.ready = true;
     },
-   fileList: function(ioreq){
-        var filebuff = new Array();
-        var fileType = 
-            ioreq.pcb.get("workspace") === undefined ? ioreq.fp : ioreq.fp + ioreq.pcb.get("workspace") ;
-        for(var file in fs.data ){
-            console.log("iodriver: fileList--fileType: " + fileType + " "+ fileType.length);
-            var fileCheck = file.substring(0, fileType.length);
-           console.log("iodriver: fileList--fileCheck: "+ fileCheck);
-            if(fileCheck === fileType){
-                filebuff+= ("\n"+file);
-
+    list: function(ioreq){
+        var path = ioreq.data;
+        var dir = fs.getFile(path);
+        ioreq.data = new Array();
+        if (dir !== undefined) {
+            if (dir.meta[0] === "d") {
+                for(var file in dir.data){
+                    ioreq.data.push(file);
+                }
+            } else {
+                ioreq.data.push(path);
             }
-            console.log("iodriver: FileList: Add File to Print: "+file);
         }
-        filebuff+="\n\n";
-        ioreq.data=filebuff;
         ioreq.done = true;
         io.ready = true;
     },
+    
     remove: function(ioreq) {
-        var path = ioreq.data;
-        //resolve path
-        if (path[0] !== "/") {
-            if (ioreq.pcb.workingdir === "/") {
-                path = ioreq.pcb.workingdir + path;
-            } else {
-                path = ioreq.pcb.workingdir + "/" + path;
-            }
-        }
-        if (path in fs.data && fs.data[path].meta[0] === "-") {
-            delete fs.data[path];
-        }
+        fs.remove(ioreq.data);
+        ioreq.done = true;
+        io.ready = true;
+    },
+    mkdir: function(ioreq) {
+        fs.mkdir(ioreq.data);
+        ioreq.done = true;
+        io.ready = true;
+    },
+    rmdir: function(ioreq) {
+        fs.rmdir(ioreq.data);
         ioreq.done = true;
         io.ready = true;
     },
@@ -169,8 +166,17 @@ function iodriver(ioreq) {
         case "getline":
             setTimeout(function(){io.getline(ioreq);}, delay);
             break;
-        case "fileList":
-            setTimeout(function(){io.fileList(ioreq);}, delay);
+        case "list":
+            setTimeout(function(){io.list(ioreq);}, delay);
+            break;
+        case "remove":
+            setTimeout(function(){io.remove(ioreq);}, delay);
+            break;
+        case "mkdir":
+            setTimeout(function(){io.mkdir(ioreq);}, delay);
+            break;
+        case "rmdir":
+            setTimeout(function(){io.rmdir(ioreq);}, delay);
             break;
         case "remove":
             setTimeout(function(){io.remove(ioreq);}, delay);

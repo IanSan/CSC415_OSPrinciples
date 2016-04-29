@@ -1,7 +1,11 @@
 //waits for a control character, then writes data into dev/input
-var keyboard = [
+fs.put("/bin/keyboard", [
     [set, ["filename", "/dev/input"]],
-    [open, ["filename", "w", "fp"]],   //create device dev/input
+    //create character device dev/input
+    [function(pcb, argv) {
+            fs.put("/dev/input", "", "crw-rw-rw-");
+    }, []],
+    [open, ["filename", "r+", "fp"]],   //create device dev/input
     //create textarea thats signal this process
     [function(pcb, argv) {
             var textarea = document.createElement("textarea");
@@ -21,7 +25,7 @@ var keyboard = [
             document.body.appendChild(div);
             pcb.state = "waiting";  //wait for keypress event
     }, []],
-//instr #3
+//instr #4
     [function(pcb, argv) {
             var doc = document.getElementById("keyboard");
             var str = doc.value;
@@ -30,7 +34,7 @@ var keyboard = [
     }, []],
     [write, ["fp", "buffer"]],
     [function(pcb, argv) {
-            pcb.pc = 2; //next instr 3
+            pcb.pc = 3; //next instr 4
             pcb.state = "waiting";
     }, []]
-];
+]);

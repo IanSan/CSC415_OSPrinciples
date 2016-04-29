@@ -1,4 +1,4 @@
-fs.put("/cat", [
+fs.put("/bin/cat", [
     [set, ["buffer", ""]],
     [open, ["stdout", "w", "out"]],
     [function(pcb, argv) {
