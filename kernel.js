@@ -262,8 +262,11 @@ function pthread_join(pcb, argv) {
     
 }
 
+//  [pthread_exit, []]
+// terminates calling thread
 function pthread_exit(pcb, argv) {
-    
+    pcb.stop();
+    console.log(pcb.toString() + " stopping");
 }
 
 /* Mutex */
