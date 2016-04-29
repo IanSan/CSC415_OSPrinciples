@@ -7,7 +7,8 @@ var fq = new Queue();
 //create new process
 var programCounter = 0;
 function load(program, name) {
-    pq.push_back(new PCB(program, name, "start", programCounter, undefined));
+    var pcb = new PCB(program, name, "start", programCounter, undefined);
+    pq.push_back(pcb.thread);
     console.log("start " + programCounter + " " + name);
     console.log(pq.tail.object.program);
     programCounter++;
@@ -242,21 +243,30 @@ function createChildProcess(pcb, argv) {
             "start",
             programCounter++,
             argv);
-    pq.push_back(child);
+    pq.push_back(child.thread);
     console.log("start " + child.toString());
 }
 
 /* Threading */
+//  [pthread_create, [_var threadName, code, _var argv]]
+// creates child thread of calling thread
 function pthread_create(pcb, argv) {
-    
+    var thread = new Thread(pcb.pcb, pcb, "start", pcb.pcb.nexttid, argv[1], argv[2]);
+    pcb.pcb.nexttid = pcb.pcb.nexttid + 1;  //increment id
+    pq.push_back(thread);
+    pcb.set(argv[0], thread);
+    console.log("start " + thread.toString());
 }
 
 function pthread_join(pcb, argv) {
     
 }
 
+//  [pthread_exit, []]
+// terminates calling thread
 function pthread_exit(pcb, argv) {
-    
+    pcb.stop();
+    console.log(pcb.toString() + " stopping");
 }
 
 /* Mutex */
