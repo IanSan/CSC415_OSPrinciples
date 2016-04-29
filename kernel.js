@@ -246,6 +246,49 @@ function createChildProcess(pcb, argv) {
     console.log("start " + child.toString());
 }
 
+/* Threading */
+function pthread_create(pcb, argv) {
+    
+}
+
+function pthread_join(pcb, argv) {
+    
+}
+
+function pthread_exit(pcb, argv) {
+    
+}
+
+/* Mutex */
+function pthread_mutex_init(pcb, argv) {
+    
+}
+
+function pthread_mutex_lock(pcb, argv) {
+    
+}
+
+function pthread_mutex_trylock(pcb, argv) {
+    
+}
+
+function pthread_mutex_unlock(pcb, argv) {
+    
+}
+
+/* Semaphores */
+function sem_init(pcb, argv) {
+    
+}
+
+function sem_wait(pcb, argv) {
+    
+}
+
+function sem_post(pcb, argv) {
+    
+}
+
 //=============================================================
 //execute process instruction
 function exec(pcb) {
