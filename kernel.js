@@ -248,8 +248,14 @@ function createChildProcess(pcb, argv) {
 }
 
 /* Threading */
+//  [pthread_create, [_var threadName, code, _var argv]]
+// creates child thread of calling thread
 function pthread_create(pcb, argv) {
-    
+    var thread = new Thread(pcb.pcb, pcb, "start", pcb.pcb.nexttid, argv[1], argv[2]);
+    pcb.pcb.nexttid = pcb.pcb.nexttid + 1;  //increment id
+    pq.push_back(thread);
+    pcb.set(argv[0], thread);
+    console.log("start " + thread.toString());
 }
 
 function pthread_join(pcb, argv) {
