@@ -1,4 +1,4 @@
-fs.put("/kill", [
+fs.put("/bin/kill", [
     [open, ["stdout", "w", "fp"]],
     [set, ["buffer", ""]],
     [function(pcb, argv) {

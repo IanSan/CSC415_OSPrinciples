@@ -1,4 +1,4 @@
-fs.put("/cp", [
+fs.put("/bin/cp", [
     [open, ["stdout", "w", "fp"]],
     [set, ["buffer", ""]],
     [function(pcb, argv) {

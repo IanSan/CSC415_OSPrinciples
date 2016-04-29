@@ -2,7 +2,7 @@
  * ps.js
  * List process being served in the Process Queue
  */
-	fs.put("/ps",[
+	fs.put("/bin/ps",[
 		[open, ["stdout", "w", "fp"]],
 		[set, ["buffer", ""]],
 		[function(pcb,argv){
