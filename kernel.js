@@ -7,7 +7,8 @@ var fq = new Queue();
 //create new process
 var programCounter = 0;
 function load(program, name) {
-    pq.push_back(new PCB(program, name, "start", programCounter, undefined));
+    var pcb = new PCB(program, name, "start", programCounter, undefined);
+    pq.push_back(pcb.thread);
     console.log("start " + programCounter + " " + name);
     console.log(pq.tail.object.program);
     programCounter++;
@@ -242,7 +243,7 @@ function createChildProcess(pcb, argv) {
             "start",
             programCounter++,
             argv);
-    pq.push_back(child);
+    pq.push_back(child.thread);
     console.log("start " + child.toString());
 }
 
