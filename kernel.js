@@ -311,8 +311,25 @@ function pthread_mutex_trylock(pcb, argv) {
     }
 }
 
+//  [pthread_mutex_unlock, [string name]]
+// Unlocks mutex. Also signals for next waiting thread to acquire lock.
 function pthread_mutex_unlock(pcb, argv) {
-    
+    //check
+    if (!(argv[0] in mutexList)) {
+        return;
+    }
+    var mutex = mutexList[argv[0]];
+    if (mutex.owner === pcb) {
+        mutex.owner = undefined;
+        mutex.locked = false;
+        //let next thread acquire mutex
+        if (!mutex.waitList.isEmpty()) {
+            mutex.owner = mutex.waitList.pop_front();
+            mutex.locked = true;
+            mutex.owner.state = "ready";
+            console.log(mutex.owner.toString() + " acquired lock on mutex " + argv[0]);
+        }
+    }
 }
 
 /* Semaphores */
