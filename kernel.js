@@ -298,8 +298,17 @@ function pthread_mutex_lock(pcb, argv) {
     }
 }
 
+//  [pthread_mutex_trylock, [string name]]
+// Attempts to lock mutex and returns immediately if already locked
 function pthread_mutex_trylock(pcb, argv) {
-    
+    if (!(argv[0] in mutexList)) {
+        mutexList[argv[0]] = new Mutex();
+    }
+    var mutex = mutexList[argv[0]];
+    if (!mutex.locked) {
+        mutex.locked = true;
+        mutex.owner = pcb;
+    }
 }
 
 function pthread_mutex_unlock(pcb, argv) {
