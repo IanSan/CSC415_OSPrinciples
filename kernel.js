@@ -4,6 +4,9 @@ var pq = new Queue();
 //io request queue
 var fq = new Queue();
 
+//associative array of mutexes - string name : mutex object
+var mutexList = {};
+
 //create new process
 var programCounter = 0;
 function load(program, name) {
@@ -270,8 +273,12 @@ function pthread_exit(pcb, argv) {
 }
 
 /* Mutex */
+//  [pthread_mutex_init, [string name]]
+// Creates mutex with given name
 function pthread_mutex_init(pcb, argv) {
-    
+    if (!(argv[0] in mutexList)) {
+        mutexList[argv[0]] = new Mutex();
+    }
 }
 
 function pthread_mutex_lock(pcb, argv) {
