@@ -4,6 +4,9 @@ var pq = new Queue();
 //io request queue
 var fq = new Queue();
 
+//associative array of mutexes - string name : mutex object
+var mutexList = {};
+
 //create new process
 var programCounter = 0;
 function load(program, name) {
@@ -270,20 +273,63 @@ function pthread_exit(pcb, argv) {
 }
 
 /* Mutex */
+//  [pthread_mutex_init, [string name]]
+// Creates mutex with given name
 function pthread_mutex_init(pcb, argv) {
-    
+    if (!(argv[0] in mutexList)) {
+        mutexList[argv[0]] = new Mutex();
+    }
 }
 
+//  [pthread_mutex_lock, [string name]]
+// Attempts to lock mutex, and blocks until acquired
 function pthread_mutex_lock(pcb, argv) {
-    
+    if (!(argv[0] in mutexList)) {
+        mutexList[argv[0]] = new Mutex();
+    }
+    var mutex = mutexList[argv[0]];
+    if (mutex.locked) {
+        mutex.waitList.push_back(pcb);
+        pcb.state = "waiting";
+        console.log(pcb.toString() + " to wait for mutex " + argv[0]);
+    } else {
+        mutex.locked = true;
+        mutex.owner = pcb;
+    }
 }
 
+//  [pthread_mutex_trylock, [string name]]
+// Attempts to lock mutex and returns immediately if already locked
 function pthread_mutex_trylock(pcb, argv) {
-    
+    if (!(argv[0] in mutexList)) {
+        mutexList[argv[0]] = new Mutex();
+    }
+    var mutex = mutexList[argv[0]];
+    if (!mutex.locked) {
+        mutex.locked = true;
+        mutex.owner = pcb;
+    }
 }
 
+//  [pthread_mutex_unlock, [string name]]
+// Unlocks mutex. Also signals for next waiting thread to acquire lock.
 function pthread_mutex_unlock(pcb, argv) {
-    
+    //check
+    if (!(argv[0] in mutexList)) {
+        return;
+    }
+    var mutex = mutexList[argv[0]];
+    if (mutex.owner === pcb) {
+        mutex.owner = undefined;
+        mutex.locked = false;
+        //let next thread acquire mutex
+        if (!mutex.waitList.isEmpty()) {
+            mutex.owner = mutex.waitList.pop_front();
+            mutex.locked = true;
+            mutex.owner.state = "ready";
+            console.log(mutex.owner.toString() + " acquired lock on mutex " + argv[0]);
+        }
+    }
 }
 
 /* Semaphores */
