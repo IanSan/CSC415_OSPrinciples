@@ -281,8 +281,21 @@ function pthread_mutex_init(pcb, argv) {
     }
 }
 
+//  [pthread_mutex_lock, [string name]]
+// Attempts to lock mutex, and blocks until acquired
 function pthread_mutex_lock(pcb, argv) {
-    
+    if (!(argv[0] in mutexList)) {
+        mutexList[argv[0]] = new Mutex();
+    }
+    var mutex = mutexList[argv[0]];
+    if (mutex.locked) {
+        mutex.waitList.push_back(pcb);
+        pcb.state = "waiting";
+        console.log(pcb.toString() + " to wait for mutex " + argv[0]);
+    } else {
+        mutex.locked = true;
+        mutex.owner = pcb;
+    }
 }
 
 function pthread_mutex_trylock(pcb, argv) {
