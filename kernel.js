@@ -7,6 +7,9 @@ var fq = new Queue();
 //associative array of mutexes - string name : mutex object
 var mutexList = {};
 
+//associative array of semaphores - string name : semaphore object
+var semList = {};
+
 //create new process
 var programCounter = 0;
 function load(program, name) {
@@ -333,16 +336,41 @@ function pthread_mutex_unlock(pcb, argv) {
 }
 
 /* Semaphores */
+//  [sem_init, [string name, int value]
+// Creates new named semaphore with initial value value
 function sem_init(pcb, argv) {
-    
+    if (!(argv[0] in semList)) {
+        semList[argv[0]] = new Semaphore(argv[1]);
+    }
 }
 
+//  [sem_wait, [string name]]
+// Decrements named semaphore. If semaphore is not positive, calling thread
+// blocks until acquired
 function sem_wait(pcb, argv) {
-    
+    var sem = semList[argv[0]];
+    if (sem.value > 0) {
+        //decrement value
+        sem.value = sem.value - 1;
+    } else {
+        //wait for lock
+        sem.waitList.push_back(pcb);
+        pcb.state = "waiting";
+        console.log(pcb.toString() + " to wait for semaphore " + argv[0]);
+    }
 }
 
+//  [sem_wait, [string name]]
+// Increments named semaphore. If new value is positive, signals for next
+// waiting thread to acquire lock.
 function sem_post(pcb, argv) {
-    
+    var sem = semList[argv[0]];
+    sem.value = sem.value + 1;
+    if (sem.value > 0 && !sem.waitList.isEmpty()) {
+        //next waiting thread to acquire lock
+        sem.value = sem.value - 1;
+        sem.waitList.pop_front().state = "ready";
+    }
 }
 
 //=============================================================
