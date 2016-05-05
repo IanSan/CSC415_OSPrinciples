@@ -7,6 +7,9 @@ var fq = new Queue();
 //associative array of mutexes - string name : mutex object
 var mutexList = {};
 
+//associative array of semaphores - string name : semaphore object
+var semList = {};
+
 //create new process
 var programCounter = 0;
 function load(program, name) {
@@ -333,8 +336,12 @@ function pthread_mutex_unlock(pcb, argv) {
 }
 
 /* Semaphores */
+//  [sem_init, [string name, int value]
+// Creates new named semaphore with initial value value
 function sem_init(pcb, argv) {
-    
+    if (!(argv[0] in semList)) {
+        semList[argv[0]] = new Semaphore(argv[1]);
+    }
 }
 
 function sem_wait(pcb, argv) {
